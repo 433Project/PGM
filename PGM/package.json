@@ -1,0 +1,9 @@
+{
+  "name": "pgm",
+  "version": "0.0.0",
+  "description": "PGM",
+  "main": "app.js",
+  "author": {
+    "name": "dongqlee"
+  }
+}
