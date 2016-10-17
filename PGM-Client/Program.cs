@@ -16,11 +16,6 @@ namespace PGM_Client
             {
                 Thread th = new Thread(Send);
                 th.Start();
-
-                Thread th2 = new Thread(Send);
-                th2.Start();
-                Thread th3 = new Thread(Send);
-                th3.Start();
             }
             catch (Exception ex)
             {

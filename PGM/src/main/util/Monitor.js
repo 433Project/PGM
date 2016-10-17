@@ -5,6 +5,8 @@ var startTime = 0;
 var duration = 0;
 var countPacket = 0;
 
+var timer = null;
+
 function init() {
     if (performanceHolder == null) {
         performanceHolder = new Map();
@@ -21,7 +23,15 @@ function setStartTime(startTime) {
 }
 
 function setTimer() {
-    setInterval(calculateIndicator, 1000); // 1초마다 수행
+    timer = setInterval(calculateIndicator, 1000); // 1초마다 수행
+}
+
+function stopTimer() {
+    if (timer!=null){
+        clearInterval(timer);
+        duration = 0;
+        countPacket = 0;
+    }
 }
 
 function getPacket() {
@@ -37,5 +47,6 @@ function calculateIndicator() {
 }
 
 module.exports.init = init;
+module.exports.stopTimer = stopTimer;
 module.exports.getPacket = getPacket;
 module.exports.performanceHolder = performanceHolder;

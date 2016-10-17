@@ -38,6 +38,7 @@
     <Compile Include="src\main\util\ConnectionManger.js" />
     <Compile Include="src\main\util\Logger.js" />
     <Compile Include="src\main\util\Monitor.js" />
+    <Content Include="config\cluster.json" />
     <Content Include="config\local.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />

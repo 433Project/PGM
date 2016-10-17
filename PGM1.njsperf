@@ -4,4 +4,9 @@
     <TargetProject>04d6bb5b-a5fa-4193-91f8-aac5cf64580c</TargetProject>
     <FriendlyName>PGM</FriendlyName>
   </ProjectTarget>
+  <Reports>
+    <Report>
+      <Filename>D:\workspace\PGM\PGM1_20161013.vspx</Filename>
+    </Report>
+  </Reports>
 </ProfilingTarget>

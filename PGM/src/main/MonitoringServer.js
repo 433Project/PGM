@@ -17,15 +17,21 @@ function initialize() {
 
     server = net.createServer(function (socket) {
         monitor.init();
-
+    
         socket.on('data', function (data) {
             monitor.getPacket();
         });
 
+        socket.on('error', function (err) {
+            console.log(err);
+        });
+        
         // client와 접속이 끊기는 메시지 출력
         socket.on('close', function () {
             console.log('client disconnted.');
+            monitor.stopTimer();
         });
+
     });// end create server
 
     server.listen(configuration.port, function () {
