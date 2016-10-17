@@ -1,0 +1,10 @@
+﻿{
+  "monitoring": {
+    "port": 12345
+  },
+  "web": {
+    "ip": "localhost",
+    "port": 12346
+  }
+
+}

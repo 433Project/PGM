@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>04d6bb5b-a5fa-4193-91f8-aac5cf64580c</TargetProject>
+    <FriendlyName>PGM</FriendlyName>
+  </ProjectTarget>
+</ProfilingTarget>
