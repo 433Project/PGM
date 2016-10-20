@@ -6,6 +6,7 @@ var clusterConfig = require('./config/cluster.json');
 var cluster = require('cluster');
 var os = require('os');
 
+/*
 if (cluster.isMaster) {
     for (var worker = 0; worker < clusterConfig.workers; worker++) {
         cluster.fork();
@@ -17,4 +18,8 @@ else {
     monitoringServer.start();
     webServer.start();
 }
+*/
+
+monitoringServer.start();
+webServer.start();
 

@@ -5,6 +5,7 @@ var configuration = require('./util/Configuration.js').monitoring;
 var monitor = require('./util/Monitor.js');
 
 var server;
+//var monitor = new Monitor();
 
 function start() {
     console.log("server start . . .");
@@ -14,10 +15,13 @@ function start() {
 function initialize() {
     console.log('load server configuration');
     console.log(configuration);
+    //monitor.init();
 
     server = net.createServer(function (socket) {
-        monitor.init();
-    
+
+
+        monitor.setTimer();
+
         socket.on('data', function (data) {
             monitor.getPacket();
         });

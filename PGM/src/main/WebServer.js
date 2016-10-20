@@ -25,19 +25,18 @@ function init() {
 
     app.get('/info', function (req, res) {
         
-        var time = 0;
-        var countPacket = monitor.performanceHolder.get(time);
+        var from = req.query.from;
+        var to = req.query.to;
 
-        var result = {
-            'duration': time,
-            'countPacket': countPacket
-        };
-
+        console.log('from,to =>' + from +',' + to);
+        
+        var result = monitor.getPerformData(from, to);
+        console.log(result);
         res.send(JSON.stringify(result));
     });
 
     app.listen(config.port, config.ip, function () {
-        console.log('[PGM][WEB] waiting . . .');
+        console.log('[PGM][WEB] waiting  on ' + config.ip + ':' + config.port + '. . .');
     });
 }
 

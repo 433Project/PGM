@@ -6,6 +6,9 @@
   "author": {
     "name": "dongqlee"
   },
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "express": "^4.14.0",
     "react": "^15.3.2",
