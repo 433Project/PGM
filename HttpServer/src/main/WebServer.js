@@ -1,12 +1,11 @@
 ﻿var express = require('express');
 var path = require('path');
 var config = require('./util/Configuration.js').web;
-var monitor = require('./util/Monitor.js');
+//var monitor = require('./util/Monitor.js');
 
 var postMan = require('./util/PostMan.js');
 
 var app = express();
-
 
 function start() {
     init();
@@ -44,11 +43,9 @@ function init() {
     });
     
     app.get('/sub', function (req, res) { 
-    
         var msg = postMan.subscribe();
 
-        res.send(msg);
-    
+        res.send(msg);    
     })
 
     app.listen(config.port, config.ip, function () {

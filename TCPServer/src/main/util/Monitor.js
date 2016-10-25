@@ -1,14 +1,16 @@
 ﻿var process = require('process');
+var PostMan = require('PostMan');
 
 // class constructor
 function Monitor () {
     this.performanceHolder = null;
     this.startTime = 0;
     this.duration = 0;
-    this.countPacket = 0;
+    this.packets = 0;
     this.timer = null;
 
     this.init = function () {
+        console.log('============================================');
         if (this.performanceHolder == null) {
             this.performanceHolder = new Map();
         }
@@ -16,9 +18,9 @@ function Monitor () {
         this.performanceHolder = new Map();
 
         this.setStartTime(process.hrtime());
-//        this.setTimer();
 
-        console.log('[PGM] monitor 셋팅 완료');
+        console.log('[TCP] monitor 셋팅 완료');
+        console.log('============================================');
     }
 
     this.setStartTime = function (startTime) {
@@ -27,6 +29,10 @@ function Monitor () {
     }
 
     this.setTimer = function () {
+        console.log('============================================');
+        console.log('[TCP] start timer');
+        console.log('============================================');
+
         this.timer = setInterval(this.calculateIndicator.bind(this), 1000); // 1초마다 수행
     }
 
@@ -34,24 +40,30 @@ function Monitor () {
         if (this.timer != null) {
             clearInterval(this.timer);
             this.duration = 0;
-            this.countPacket = 0;
+            this.packets = 0;
         }
     }
-
+    
     this.getPacket = function () {
-        this.countPacket++;
+        this.packets++;
     }
 
     this.calculateIndicator = function () {
         console.log(this.performanceHolder);
 
-        this.performanceHolder.set(this.duration, this.countPacket);
-        console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.countPacket + '개 수신함');
-        this.countPacket = 0;
+        this.performanceHolder.set(this.duration, this.packets);
+        console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
+        this.packets = 0;
         this.duration++;
-    }
 
-    // from ~ to 의 data 
+        // publish
+        PostMan.publish({"duration": this.duration, "packets": this.packets});
+
+    }
+    
+    
+    // from ~ to 의 data를 반환한다.
+    // deprecated.
     this.getPerformData = function (from, to) {
 
         var result = [];
@@ -59,7 +71,7 @@ function Monitor () {
         for (var idx = from; idx < to; idx++) {
             result.push({
                 'duration': idx,
-                'countPacket': this.performanceHolder.get(idx)
+                'packets': this.performanceHolder.get(idx)
             });
         } 
         return result;
@@ -96,20 +108,20 @@ Monitor.prototype.stopTimer = function () {
     if (this.timer != null) {
         clearInterval(timer);
         this.duration = 0;
-        this.countPacket = 0;
+        this.packets = 0;
     }
 }
 
 Monitor.prototype.getPacket = function () {
-    this.countPacket++;
+    this.packets++;
 
 } 
 
 Monitor.prototype.calculateIndicator = function () {
     console.log(this.performanceHolder);
-    this.performanceHolder.set(this.duration, this.countPacket);
-    console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.countPacket + '개 수신함');
-    this.countPacket = 0;
+    this.performanceHolder.set(this.duration, this.packets);
+    console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
+    this.packets = 0;
     this.duration++;
 }
 
@@ -127,7 +139,7 @@ var process = require('process');
 var performanceHolder = null; // second from start time, count
 var startTime = 0;
 var duration = 0;
-var countPacket = 0;
+var packets = 0;
 
 var timer = null;
 
@@ -154,19 +166,19 @@ function stopTimer() {
     if (timer!=null){
         clearInterval(timer);
         duration = 0;
-        countPacket = 0;
+        packets = 0;
     }
 }
 
 function getPacket() {
-    countPacket++;
+    packets++;
 }
 
 function calculateIndicator() {
 
-    performanceHolder.set(duration, countPacket);
-    console.log(duration + ' ~ ' + (duration + 1) + '동안' + countPacket + '개 수신함');
-    countPacket = 0;
+    performanceHolder.set(duration, packets);
+    console.log(duration + ' ~ ' + (duration + 1) + '동안' + packets + '개 수신함');
+    packets = 0;
     duration++;
 }
 

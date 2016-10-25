@@ -19,10 +19,11 @@ function initialize() {
 
     server = net.createServer(function (socket) {
 
-
         monitor.setTimer();
 
         socket.on('data', function (data) {
+            // packet을 받았음.
+            // inc packet count
             monitor.getPacket();
         });
 
