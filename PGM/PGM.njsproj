@@ -30,6 +30,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="tcpApp.js" />
+    <Compile Include="httpApp.js" />
     <Compile Include="app.js" />
     <Compile Include="src\main\WebServer.js" />
     <Compile Include="src\main\MonitoringServer.js" />

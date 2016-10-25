@@ -7,7 +7,10 @@
     "name": "dongqlee"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "start-pm2" : "pm2 start app.js",
+    "start-http-server": " node httpApp.js",
+    "start-tcp-server": " node tcpApp.js"
   },
   "dependencies": {
     "express": "^4.14.0",
