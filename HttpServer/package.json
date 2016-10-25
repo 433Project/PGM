@@ -1,0 +1,20 @@
+{
+  "name": "http-server",
+  "version": "0.0.0",
+  "description": "HttpServer",
+  "main": "app.js",
+  "scripts": {
+    "start-server": "pm2 start app.js --name httpserver",
+    "stop-server": "pm2 stop httpserver",
+    "kill-server": "pm2 delete httpserver",
+    "monitor-server": "pm2 monit",
+    "reload-server": "pm2 reload httpserver",
+    "logs" : "pm2 logs httpserver"
+  },
+  "author": {
+    "name": "dongqlee"
+  },
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

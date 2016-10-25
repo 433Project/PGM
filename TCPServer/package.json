@@ -1,0 +1,17 @@
+{
+  "name": "tcpserver",
+  "version": "0.0.0",
+  "description": "TCPServer",
+  "main": "server.js",
+  "author": {
+    "name": "dongqlee"
+  },
+  "scripts": {
+    "start-server": "pm2 start app.js --name tcpserver",
+    "stop-server": "pm2 stop tcpserver",
+    "kill-server": "pm2 delete tcpserver",
+    "monitor-server": "pm2 monit",
+    "reload-server": "pm2 reload tcpserver",
+    "logs" : "pm2 logs tcpserver"
+  }
+}

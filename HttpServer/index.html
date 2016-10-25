@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>PGM</title>
+
+    <script src="https://unpkg.com/react@15.3.2/dist/react.min.js"></script>
+    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <style>
+        body {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .area {
+            fill: steelblue;
+        }
+    </style>
+
+    <script>
+        var from = 0;
+        var to = 0;
+       
+        function loadInfo() {
+
+            from = to;
+            to += 3;
+
+            $.ajax({
+                type: "GET",
+                url: "/info?from="+from+"&to="+to,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function(err){
+                    alert("시스템에러");
+                }
+            });// end ajax
+        }
+
+        setInterval(loadInfo, 3000);
+
+        $(function () {
+            // 5초마다 view update
+            
+        });
+    </script>
+</head>
+<body>
+
+    <div id="container">
+        안뇽
+    </div>
+
+
+
+</body>
+</html>
