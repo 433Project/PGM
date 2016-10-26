@@ -7,11 +7,11 @@ function init() {
 }
 
 function addClient(client, socket) {
-    return clientLists.set(client.ip+':'+client.port, socket);
+    return clientLists.set(client.ip + ':' + client.port, socket);
 }
 
 function deleteClient(client) {
-    return clientLists.delete(client.ip+':'+client.port);
+    return clientLists.delete(client.ip + ':' + client.port);
 }
 
 module.exports.init = init;

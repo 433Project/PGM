@@ -8,16 +8,24 @@ function DataHolder() {
     }
 
     this.addData = function (data) {
-
+        this.holder.set(data.duration, data.packets);
     }
 
     this.getData = function (from, to) {
+        var result = [];
 
+        for (var idx = from; idx < to; idx++) {
+            result.push({
+                'duration': idx,
+                'packets': this.performanceHolder.get(idx)
+            });
+        }
+        return result;
     }
 
     this.clearData = function (data) {
-
-    }
+        this.holder.clear();
+    }    
 }
 
 

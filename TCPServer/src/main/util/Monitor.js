@@ -1,8 +1,8 @@
 ﻿var process = require('process');
-var PostMan = require('PostMan');
+var PostMan = require('./PostMan.js');
 
 // class constructor
-function Monitor () {
+function Monitor() {
     this.performanceHolder = null;
     this.startTime = 0;
     this.duration = 0;
@@ -21,6 +21,18 @@ function Monitor () {
 
         console.log('[TCP] monitor 셋팅 완료');
         console.log('============================================');
+    }
+
+    this.clear = function () {
+        // clear map.
+        // stop timer
+
+        this.performanceHolder.clear();
+        this.stopTimer();
+
+        console.log('============================================');
+        console.log('[TCP] monitor clear');
+        console.log('============================================\n\n\n');
     }
 
     this.setStartTime = function (startTime) {
@@ -43,7 +55,7 @@ function Monitor () {
             this.packets = 0;
         }
     }
-    
+
     this.getPacket = function () {
         this.packets++;
     }
@@ -52,16 +64,15 @@ function Monitor () {
         console.log(this.performanceHolder);
 
         this.performanceHolder.set(this.duration, this.packets);
+        // publish
+        PostMan.publish({ "duration": this.duration, "packets": this.packets });
         console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
+
         this.packets = 0;
         this.duration++;
-
-        // publish
-        PostMan.publish({"duration": this.duration, "packets": this.packets});
-
     }
-    
-    
+
+
     // from ~ to 의 data를 반환한다.
     // deprecated.
     this.getPerformData = function (from, to) {
@@ -73,7 +84,7 @@ function Monitor () {
                 'duration': idx,
                 'packets': this.performanceHolder.get(idx)
             });
-        } 
+        }
         return result;
     }
 }
@@ -81,6 +92,8 @@ function Monitor () {
 var monitorInstance = new Monitor();
 monitorInstance.init();
 module.exports = monitorInstance;
+
+
 /*
 모듈화 2차 
 // class method

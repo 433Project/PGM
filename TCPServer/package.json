@@ -6,10 +6,6 @@
   "author": {
     "name": "dongqlee"
   },
-  "dependencies": {
-
-    "PostMan": "./src/main/util/PosetMan.js"
-  },
   "scripts": {
     "start-server": "pm2 start app.js --name tcpserver",
     "stop-server": "pm2 stop tcpserver",

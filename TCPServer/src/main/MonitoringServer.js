@@ -8,7 +8,8 @@ var server;
 //var monitor = new Monitor();
 
 function start() {
-    console.log("server start . . .");
+    console.log("server start . . .id :" + process.env.id);
+   
     initialize();
 }
 
@@ -30,17 +31,17 @@ function initialize() {
         socket.on('error', function (err) {
             console.log(err);
         });
-        
+
         // client와 접속이 끊기는 메시지 출력
         socket.on('close', function () {
             console.log('client disconnted.');
-            monitor.stopTimer();
+            monitor.clear();
         });
 
     });// end create server
 
     server.listen(configuration.port, function () {
-        console.log('[PGM][Monitoring] listening on ' + configuration.port);    
+        console.log('[PGM][Monitoring] listening on ' + configuration.port);
     });
 }
 

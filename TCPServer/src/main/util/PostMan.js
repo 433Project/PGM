@@ -1,13 +1,13 @@
 ﻿var amqp = require('amqplib/callback_api');
 
 function PostMan() {
-    this.queueName = "pgm";   
-
+    this.queueName = 'pgm2';
+    this.encoding = 'utf8';
     // publish message
     this.publish = function (msg) {
-        this.channel.sendToQueue(this.queueName, new Buffer(msg));
+        this.channel.sendToQueue(this.queueName, new Buffer(JSON.stringify(msg), this.encoding));
         console.log('[TCP][PUB] send message : ' + msg);
-    } 
+    }
 };
 
 PostMan.prototype.channel = null;
@@ -24,8 +24,8 @@ PostMan.prototype.init = function () {
                 console.log('=======================================================');
             }
             else {
-                ch.assertQueue(this.queueName, { durable: false });                
-
+                ch.assertQueue(this.queueName, { durable: true });
+                
                 console.log('[TCP] queue 생성 완료');
                 console.log('[TCP] message queue 초기화 완료');
                 console.log('=======================================================');

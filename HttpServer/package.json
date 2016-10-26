@@ -9,14 +9,13 @@
     "kill-server": "pm2 delete httpserver",
     "monitor-server": "pm2 monit",
     "reload-server": "pm2 reload httpserver",
-    "logs" : "pm2 logs httpserver"
+    "logs": "pm2 logs httpserver"
   },
   "author": {
     "name": "dongqlee"
   },
   "dependencies": {
-    "config": "./confing/local.json",
-    "DataHolder": "./src/main/util/DataHolder.js",
+    "async": "^2.1.2",
     "express": "^4.14.0"
   }
 }
