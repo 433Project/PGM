@@ -1,13 +1,11 @@
 ﻿<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
     <meta charset="utf-8" />
     <title>PGM</title>
 
-    <script src="https://unpkg.com/react@15.3.2/dist/react.min.js"></script>
-    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
         body {
@@ -26,46 +24,103 @@
         }
     </style>
 
+</head>
+<body>
     <script>
+
+        var graphData = [{"duration":"0", "packets":"0"}];
+
+        var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+        var x = d3.scale.linear()
+            .range([0, 100]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+     .scale(x)
+     .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        var area = d3.svg.area()
+            .x(function (d) { return x(d.duration); })
+            .y0(height)
+            .y1(function (d) { return y(d.packets); });
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // 나머지 그려 ~
+        x.domain(d3.extent(graphData, function (d) { return d.duration; }));
+        y.domain([0, d3.max(graphData, function (d) { return d.packets; })]);
+
+        svg.append("path")
+            .data([graphData])
+            .attr("class", "area")
+            .attr("d", area);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+          .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Price ($)");
+
+        ///====================================================================================
+        ///====================================================================================
+        ///====================================================================================
         var from = 0;
         var to = 0;
-       
+
+        var testx = 0;
+        var testy = 1000;
         function loadInfo() {
 
             from = to;
             to += 3;
 
-            $.ajax({
-                type: "GET",
-                url: "/info?from="+from+"&to="+to,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                success: function (res) {
-                    console.log(res);
-                },
-                error: function(err){
-                    alert("시스템에러");
-                }
-            });// end ajax
+            testx += 2;
+            testy += 20;
+
+            d3.json("/info?from=" + from + "&to=" + to, function (data) {
+                console.log(data);
+                //graphData.concat(data);
+                graphData.push({ "duration": testx, "packets": testy });
+
+
+                
+                // 나머지 그려 ~
+                x.domain(d3.extent(graphData, function (d) { return d.duration; }));
+                y.domain([0, d3.max(graphData, function (d) { return d.packets; })]);
+
+                svg.selectAll("path").data([graphData])
+                .attr("d", area);
+
+                
+
+            });
         }
 
         setInterval(loadInfo, 3000);
-
-        $(function () {
-            // 5초마다 view update
-            
-        });
     </script>
-</head>
-<body>
-
-    <div id="container">
-        안뇽
-    </div>
-
-
 
 </body>
+
 </html>

@@ -17,7 +17,7 @@ function DataHolder() {
         for (var idx = from; idx < to; idx++) {
             result.push({
                 'duration': idx,
-                'packets': this.performanceHolder.get(idx)
+                'packets': this.holder.get(idx)
             });
         }
         return result;
@@ -27,7 +27,6 @@ function DataHolder() {
         this.holder.clear();
     }    
 }
-
 
 var instance = new DataHolder();
 instance.init();

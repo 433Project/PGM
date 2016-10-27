@@ -11,11 +11,7 @@ var app = express();
 function start() {
     //async.series([init, postMan.init, postMan.subscribe]);
     init();
-
-
     async.series([postMan.init, postMan.subscribe]);
-    //postMan.init();
-    //postMan.subscribe();
 }
 
 var reqLogger = function findIP(req, res, next) {
