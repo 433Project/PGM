@@ -1,5 +1,4 @@
 ﻿
-
 function DataHolder() {
     this.holder = null;
 
@@ -13,6 +12,16 @@ function DataHolder() {
 
     this.getData = function (from, to) {
         var result = [];
+        var from = from;
+        var to = to;
+
+        if(!Number.isInteger(from)){
+            from = Number.parseInt(from);
+        }
+
+        if(!Number.isInteger(to)){
+            to = Number.parseInt(to);
+        }
 
         for (var idx = from; idx < to; idx++) {
             result.push({
