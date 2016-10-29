@@ -25,6 +25,11 @@ function initialize() {
         socket.on('data', function (data) {
             // packet을 받았음.
             // inc packet count
+
+            //console.log(data.byteLength);
+
+            // byte -> packet gen
+            // send message to =>
             monitor.getPacket();
         });
 

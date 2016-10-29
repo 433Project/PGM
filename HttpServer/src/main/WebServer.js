@@ -9,7 +9,6 @@ var async = require('async');
 var app = express();
 
 function start() {
-    //async.series([init, postMan.init, postMan.subscribe]);
     init();
     async.series([postMan.init, postMan.subscribe]);
 }
@@ -19,23 +18,25 @@ var reqLogger = function findIP(req, res, next) {
     next();
 }
 
-function init(callback) {
-
+function init() {
     app.use(reqLogger);
 
     app.get('/', function (req, res) {
+        postMan.subscribe();
         res.sendFile(path.join(__dirname, '..', '..', 'index.html'));
     });
 
+    // /info?from,to
     app.get('/info', function (req, res) {
 
-        var from = req.query.from;
+        var from = req.query.from; 
         var to = req.query.to;
 
         console.log('from,to =>' + from + ',' + to);
 
         var result = dataHolder.getData(from, to);
         console.log(result);
+        
         res.send(JSON.stringify(result));
     });
 

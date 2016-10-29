@@ -32,15 +32,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="lib\flatbuffersjs.js" />
+    <Compile Include="lib\Packet.js" />
     <Compile Include="src\main\util\DataHolder.js" />
     <Compile Include="src\main\util\FileLogger.js" />
     <Compile Include="src\main\util\PostMan.js" />
+    <Compile Include="src\main\WebServer.js" />
     <Content Include="index.html" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="schema\Packet.fbs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
+    <Folder Include="lib\" />
+    <Folder Include="schema\" />
     <Folder Include="resources\" />
     <Folder Include="resources\css\" />
     <Folder Include="resources\images\" />
@@ -53,12 +59,16 @@
     <Folder Include="typings\" />
     <Folder Include="typings\globals\" />
     <Folder Include="typings\globals\amqplib\" />
+    <Folder Include="typings\globals\async\" />
+    <Folder Include="typings\globals\config\" />
     <Folder Include="typings\globals\express\" />
     <Folder Include="typings\globals\node\" />
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="typings\globals\amqplib\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\async\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\config\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\express\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
     <TypeScriptCompile Include="typings\index.d.ts" />

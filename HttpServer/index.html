@@ -5,83 +5,72 @@
     <meta charset="utf-8" />
     <title>PGM</title>
 
-    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
-        body {
-            font: 10px sans-serif;
+      .axis--x path {
+          display: none;
         }
 
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: #000;
-            shape-rendering: crispEdges;
-        }
-
-        .area {
-            fill: steelblue;
+        .line {
+          fill: none;
+          stroke: steelblue;
+          stroke-width: 1.5px;
         }
     </style>
+    <svg width="960" height="500"></svg>
 
 </head>
 <body>
     <script>
 
-        var graphData = [{"duration":"0", "packets":"0"}];
+        var graphData = [{"duration":0, "packets": 0}];
 
-        var margin = { top: 20, right: 20, bottom: 30, left: 50 },
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+        var svg = d3.select("svg"),
+     margin = { top: 20, right: 20, bottom: 30, left: 50 },
+     width = +svg.attr("width") - margin.left - margin.right,
+     height = +svg.attr("height") - margin.top - margin.bottom,
+     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var x = d3.scale.linear()
-            .range([0, 100]);
+        //var parseTime = d3.timeParse("%d-%b-%y");
 
-        var y = d3.scale.linear()
-            .range([height, 0]);
+        var parseTime = d3.timeParse("%S");
 
-        var xAxis = d3.svg.axis()
-     .scale(x)
-     .orient("bottom");
+        var x = d3.scaleOrdinal().range([10, width]);
+//        var x = d3.scale().range([10, width]);
 
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+        var y = d3.scaleLinear()
+            .rangeRound([height, 10]);
 
-        var area = d3.svg.area()
+        var line = d3.line()
             .x(function (d) { return x(d.duration); })
-            .y0(height)
-            .y1(function (d) { return y(d.packets); });
+            .y(function (d) { return y(d.packets); });
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        //x.domain(d3.extent(graphData, function (d) { return d.duration; }));
+        x.domain(graphData.map(function (d) { return d.duration;}));
+        y.domain(d3.extent(graphData, function (d) { return d.packets; }));
 
-        // 나머지 그려 ~
-        x.domain(d3.extent(graphData, function (d) { return d.duration; }));
-        y.domain([0, d3.max(graphData, function (d) { return d.packets; })]);
-
-        svg.append("path")
-            .data([graphData])
-            .attr("class", "area")
-            .attr("d", area);
-
-        svg.append("g")
-            .attr("class", "x axis")
+        g.append("g")
+            .attr("class", "axis axis--x")
             .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
+            .call(d3.axisBottom(x).tickFormat("d").ticks(5));
 
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-          .append("text")
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("fill", "#000")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
-            .attr("dy", ".71em")
+            .attr("dy", "0.71em")
             .style("text-anchor", "end")
-            .text("Price ($)");
+            .text("Packets");
+
+        g.append("path")
+            .data([graphData])
+            .attr("class", "line")
+            .attr("d", line);
+        
 
         ///====================================================================================
         ///====================================================================================
@@ -89,32 +78,72 @@
         var from = 0;
         var to = 0;
 
-        var testx = 0;
-        var testy = 1000;
         function loadInfo() {
 
             from = to;
             to += 3;
 
-            testx += 2;
-            testy += 20;
-
             d3.json("/info?from=" + from + "&to=" + to, function (data) {
-                console.log(data);
-                //graphData.concat(data);
-                graphData.push({ "duration": testx, "packets": testy });
 
+                for (var item in data) {
 
-                
-                // 나머지 그려 ~
+                    //data[item].duration = parseTime(data[item].duration);
+                    graphData.push(data[item]);
+                }
+
                 x.domain(d3.extent(graphData, function (d) { return d.duration; }));
-                y.domain([0, d3.max(graphData, function (d) { return d.packets; })]);
+                y.domain(d3.extent(graphData, function (d) { return d.packets; }));
 
-                svg.selectAll("path").data([graphData])
-                .attr("d", area);
+                d3.select("svg").select("g").selectAll("path").remove();
+                d3.select("svg").select(".axis--x").remove();
+                d3.select("svg").select(".axis--y").remove();
+                
+                g.append("path")
+                    .data([graphData])
+                    .attr("class", "line")
+                    .attr("d", line);
+
+                g.append("g")
+                    .attr("class", "axis axis--x")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x).tickFormat(d3.format("d")).tickSize(10));
+
+                g.append("g")
+                  .attr("class", "axis axis--y")
+                  .call(d3.axisLeft(y))
+                  .append("text")
+                  .attr("fill", "#000")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", 6)
+                  .attr("dy", "0.71em")
+                  .style("text-anchor", "end")
+                  .text("Packets");
+
+
+                /*
+                g.append("g")
+                    .attr("class", "axis axis--x")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+
+                g.append("g")
+                    .attr("class", "axis axis--y")
+                    .call(d3.axisLeft(y))
+                    .append("text")
+                    .attr("fill", "#000")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", "0.71em")
+                    .style("text-anchor", "end")
+                    .text("Price ($)");
+
+                g.append("path")
+                    .data([graphData])
+                    .attr("class", "line")
+                    .attr("d", line);
+                */
 
                 
-
             });
         }
 

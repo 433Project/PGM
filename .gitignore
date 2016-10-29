@@ -7,6 +7,8 @@
 
 # nodejs module
 node_moules/
+**/node_modules/
+
 
 # nodejs intellisense
 typings/

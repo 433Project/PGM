@@ -29,16 +29,26 @@ namespace PGM_Client
             client = new TcpClient();
             client.Connect("localhost", 12345);
 
-            string dataToSend = "";
-            dataToSend += "123";
+
+            //string dataToSend = "";
+            //dataToSend += "123";
+
+            int dataToSend = 100;
+
             byte[] data;
-            data = Encoding.Default.GetBytes(dataToSend);
+
+            data = BitConverter.GetBytes(dataToSend);
+            //data = Encoding.Default.GetBytes(dataToSend);
 
             NetworkStream writeStream = null;
             writeStream = client.GetStream();
 
-            int count = 0;
+            
 
+            writeStream.Write(data, 0, data.Length);
+
+            Console.ReadKey();
+            /*
             while (true)
             {
                 count++;
@@ -49,7 +59,8 @@ namespace PGM_Client
                     Console.WriteLine("send : " + count);
                     count = 0;
                 }
-            }
+            }// end loop
+             */
         }
     }
 }

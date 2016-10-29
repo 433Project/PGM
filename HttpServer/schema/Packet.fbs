@@ -1,0 +1,37 @@
+﻿namespace packet;
+
+
+enum SrcDstType :int
+{
+	MATCHING_SERVER = 0,
+	MATCHING_CLIENT,
+	ROOM_MANAGER,
+	PACKET_GENERATOR,
+	MONITORING_SERVER
+}
+
+enum Command
+{
+	MATCH_REQUEST,
+	MATCH_COMPLET,
+	LATENCY,
+	HEALTH_CHECK,
+	MSLIST_REQUEST,
+	PG_START,
+	PG_END
+}
+
+strcut Header{
+	length: int;
+	srcType: SrcDstType;
+	srcCode: int;
+	dstType: SrcDstType;
+	dstCode: int;
+}
+
+
+struct Body{
+	cmd: cmd;
+	data: string;
+
+}
