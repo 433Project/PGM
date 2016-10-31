@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="src\main\MonitoringServer.js" />
+    <Compile Include="src\main\types\Message.js" />
     <Compile Include="src\main\util\ConnectionManger.js" />
     <Compile Include="src\main\util\Monitor.js" />
     <Compile Include="src\main\util\PostMan.js" />
