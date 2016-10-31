@@ -42,7 +42,6 @@ namespace PGM_Client
 
             NetworkStream writeStream = null;
             writeStream = client.GetStream();
-
             
 
             writeStream.Write(data, 0, data.Length);

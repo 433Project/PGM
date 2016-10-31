@@ -4,19 +4,23 @@ var path = process.cwd();
 var configuration = require('./util/Configuration.js').monitoring;
 var monitor = require('./util/Monitor.js');
 
+var flatbuffers = require('../../lib/flatbuffersjs.js').flatbuffers;
+var Packet = require('../../schema/Packet_generated.js').packet;
+
 var server;
 //var monitor = new Monitor();
+var builder = new flatbuffers.Builder(0);
+
 
 function start() {
     console.log("server start . . .id :" + process.env.id);
-   
+    console.log(Packet);
     initialize();
 }
 
 function initialize() {
     console.log('load server configuration');
     console.log(configuration);
-    //monitor.init();
 
     server = net.createServer(function (socket) {
 
@@ -25,8 +29,20 @@ function initialize() {
         socket.on('data', function (data) {
             // packet을 받았음.
             // inc packet count
+            data = new Uint8Array(data);
+            
+            var buf = new flatbuffers.ByteBuffer(data);
+            
+            var genPacket = Packet.Header.getRootAsHeader(buf);
 
-            //console.log(data.byteLength);
+            console.log('오?');
+            console.log(genPacket);
+            console.log(genPacket.length()); 
+            console.log(genPacket.srcCode());
+            console.log(genPacket.srcType());
+
+            console.log(genPacket.dstCode());
+            console.log(genPacket.dstType());
 
             // byte -> packet gen
             // send message to =>

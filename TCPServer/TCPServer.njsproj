@@ -36,6 +36,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
+    <Folder Include="lib\" />
+    <Folder Include="schema\" />
     <Folder Include="src\" />
     <Folder Include="src\main\" />
     <Folder Include="src\main\types\" />

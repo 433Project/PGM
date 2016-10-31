@@ -33,7 +33,6 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="lib\flatbuffersjs.js" />
-    <Compile Include="lib\Packet.js" />
     <Compile Include="src\main\util\DataHolder.js" />
     <Compile Include="src\main\util\FileLogger.js" />
     <Compile Include="src\main\util\PostMan.js" />

@@ -8,7 +8,13 @@ var async = require('async');
 
 var app = express();
 
+var fileLogger = require('./util/FileLogger');
 function start() {
+
+    //async.series([fileLogger.createFile, fileLogger.writeLog('asdfasdf')]);
+    fileLogger.createFile();
+    //fileLogger.writeLog('hi!');
+    
     init();
     async.series([postMan.init, postMan.subscribe]);
 }
@@ -46,15 +52,22 @@ function init() {
         postMan.publish(msg);
     });
 
-    app.get('/sub', function (req, res) {
+    app.get('/sub', function (req, res){
         postMan.subscribe();
     })
 
+    app.get('/write', (req, res) => {
+        fileLogger.writeLog('asdf');
+    });
+
     app.listen(config.port, config.ip, function () {
+
         console.log('\n=======================================================');
         console.log('[HTTP] waiting  on ' + config.ip + ':' + config.port + '. . .');
         console.log('\n=======================================================');
+
         //postMan.subscribe();
+
     });
 }
 
