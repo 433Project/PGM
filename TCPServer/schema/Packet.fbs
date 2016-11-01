@@ -31,7 +31,6 @@ table Header{
 	dstCode: int;
 }
 
-
 table Body{
 	cmd: Command;
 	data: string;

@@ -33,6 +33,7 @@
   <ItemGroup>
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="schema\Packet.fbs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
@@ -54,8 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="schema\JavaScript.js" />
+    <Compile Include="schema\Packet_generated.js" />
     <Compile Include="src\main\MonitoringServer.js" />
     <Compile Include="src\main\types\Message.js" />
+    <Compile Include="src\main\types\Protocol.js" />
     <Compile Include="src\main\util\ConnectionManger.js" />
     <Compile Include="src\main\util\Monitor.js" />
     <Compile Include="src\main\util\PostMan.js" />

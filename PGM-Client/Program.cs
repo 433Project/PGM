@@ -34,19 +34,21 @@ namespace PGM_Client
             //dataToSend += "123";
 
             int dataToSend = 100;
+            int[] testData = { 8, 2, 3, 4, 5, 5, 5 };
 
-            byte[] data;
+            //byte[] data;
+            //data = BitConverter.GetBytes(testData);
 
-            data = BitConverter.GetBytes(dataToSend);
-            //data = Encoding.Default.GetBytes(dataToSend);
-
+            byte[] result = new byte[testData.Length * sizeof(int)];
+            Buffer.BlockCopy(testData, 0, result, 0, result.Length);
+            
             NetworkStream writeStream = null;
             writeStream = client.GetStream();
-            
 
-            writeStream.Write(data, 0, data.Length);
+            writeStream.Write(result, 0, result.Length);
 
             Console.ReadKey();
+
             /*
             while (true)
             {

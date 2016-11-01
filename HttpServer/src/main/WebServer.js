@@ -4,17 +4,17 @@ var config = require('./util/Configuration.js').web;
 
 var postMan = require('./util/PostMan.js');
 var dataHolder = require('./util/DataHolder.js');
+var test = require('./types/Test');
+
 var async = require('async');
 
 var app = express();
 
 var fileLogger = require('./util/FileLogger');
-function start() {
 
-    //async.series([fileLogger.createFile, fileLogger.writeLog('asdfasdf')]);
+function start() {
     fileLogger.createFile();
-    //fileLogger.writeLog('hi!');
-    
+
     init();
     async.series([postMan.init, postMan.subscribe]);
 }
@@ -40,7 +40,8 @@ function init() {
 
         console.log('from,to =>' + from + ',' + to);
 
-        var result = dataHolder.getData(from, to);
+        var result = test.dataHolder.getData(from, to);
+        
         console.log(result);
         
         res.send(JSON.stringify(result));

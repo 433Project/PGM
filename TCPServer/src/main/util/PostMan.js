@@ -6,8 +6,8 @@ function PostMan() {
 
     // publish message
     this.publish = function (msg) {
-        this.channel.sendToQueue(this.queueName, new Buffer(JSON.stringify(msg), this.encoding));
         console.log('[TCP][PUB] send message : ' + msg);
+        this.channel.sendToQueue(this.queueName, new Buffer(JSON.stringify(msg), this.encoding));
     }
 };
 

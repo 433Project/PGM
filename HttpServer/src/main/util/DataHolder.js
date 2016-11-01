@@ -1,11 +1,11 @@
-﻿
-function DataHolder() {
+﻿function DataHolder() {
     this.holder = null;
 
     this.init = function () {
         this.holder = new Map();
     }
-
+    
+    // data : json object 
     this.addData = function (data) {
         this.holder.set(data.duration, data.packets);
     }
