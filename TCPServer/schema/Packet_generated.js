@@ -29,7 +29,8 @@ packet.Command = {
     HEALTH_CHECK: 3,
     MSLIST_REQUEST: 4,
     PG_START: 5,
-    PG_END: 6
+    PG_END: 6,
+    PG_DUMMY: 7
 };
 
 /**
@@ -40,7 +41,7 @@ packet.Header = function () {
      * @type {flatbuffers.ByteBuffer}
      */
     this.bb = null;
-    
+
     /**
      * @type {number}
      */
@@ -71,16 +72,16 @@ packet.Header.getRootAsHeader = function (bb, obj) {
  * @returns {number}
  */
 packet.Header.prototype.length = function () {
-    var offset = this.bb.__offset(this.bb_pos, 0);
-    return this.bb.readInt32(0);
+    var offset = this.bb.__offset(this.bb_pos, 4);
+    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
 };
 
 /**
  * @returns {packet.SrcDstType}
  */
 packet.Header.prototype.srcType = function () {
-    var offset = this.bb.__offset(this.bb_pos, 4);
-    return this.bb.readInt32(4);
+    var offset = this.bb.__offset(this.bb_pos, 6);
+    return offset ? /** @type {packet.SrcDstType} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.SrcDstType.MATCHING_SERVER;
 };
 
 /**
@@ -88,7 +89,7 @@ packet.Header.prototype.srcType = function () {
  */
 packet.Header.prototype.srcCode = function () {
     var offset = this.bb.__offset(this.bb_pos, 8);
-    return this.bb.readInt32(8);
+    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
 };
 
 /**
@@ -96,7 +97,7 @@ packet.Header.prototype.srcCode = function () {
  */
 packet.Header.prototype.dstType = function () {
     var offset = this.bb.__offset(this.bb_pos, 10);
-    return this.bb.readInt32(12);
+    return offset ? /** @type {packet.SrcDstType} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.SrcDstType.MATCHING_SERVER;
 };
 
 /**
@@ -104,8 +105,7 @@ packet.Header.prototype.dstType = function () {
  */
 packet.Header.prototype.dstCode = function () {
     var offset = this.bb.__offset(this.bb_pos, 12);
-    //return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
-    return this.bb.readInt32(16);
+    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
 };
 
 /**
@@ -172,7 +172,7 @@ packet.Body = function () {
      * @type {flatbuffers.ByteBuffer}
      */
     this.bb = null;
-    
+
     /**
      * @type {number}
      */
@@ -203,10 +203,8 @@ packet.Body.getRootAsBody = function (bb, obj) {
  * @returns {packet.Command}
  */
 packet.Body.prototype.cmd = function () {
-    //var offset = this.bb.__offset(this.bb_pos, 4);
-    //return offset ? /** @type {packet.Command} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.Command.MATCH_REQUEST;
-    
-    return (this.bb.readInt32(0));
+    var offset = this.bb.__offset(this.bb_pos, 4);
+    return offset ? /** @type {packet.Command} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.Command.MATCH_REQUEST;
 };
 
 /**
@@ -214,9 +212,8 @@ packet.Body.prototype.cmd = function () {
  * @returns {string|Uint8Array}
  */
 packet.Body.prototype.data = function (optionalEncoding) {
-    //var offset = this.bb.__offset(this.bb_pos, 6);
-    //return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
-    return (this.bb.readInt32(4));
+    var offset = this.bb.__offset(this.bb_pos, 6);
+    return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
 
 /**
@@ -249,6 +246,99 @@ packet.Body.addData = function (builder, dataOffset) {
 packet.Body.endBody = function (builder) {
     var offset = builder.endObject();
     return offset;
+};
+
+/**
+ * @constructor
+ */
+packet.Packet = function () {
+    /**
+     * @type {flatbuffers.ByteBuffer}
+     */
+    this.bb = null;
+
+    /**
+     * @type {number}
+     */
+    this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {packet.Packet}
+ */
+packet.Packet.prototype.__init = function (i, bb) {
+    this.bb_pos = i;
+    this.bb = bb;
+    return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {packet.Packet=} obj
+ * @returns {packet.Packet}
+ */
+packet.Packet.getRootAsPacket = function (bb, obj) {
+    return (obj || new packet.Packet).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {packet.Header=} obj
+ * @returns {packet.Header}
+ */
+packet.Packet.prototype.header = function (obj) {
+    var offset = this.bb.__offset(this.bb_pos, 4);
+    return offset ? (obj || new packet.Header).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
+ * @param {packet.Body=} obj
+ * @returns {packet.Body}
+ */
+packet.Packet.prototype.body = function (obj) {
+    var offset = this.bb.__offset(this.bb_pos, 6);
+    return offset ? (obj || new packet.Body).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+packet.Packet.startPacket = function (builder) {
+    builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} headerOffset
+ */
+packet.Packet.addHeader = function (builder, headerOffset) {
+    builder.addFieldOffset(0, headerOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} bodyOffset
+ */
+packet.Packet.addBody = function (builder, bodyOffset) {
+    builder.addFieldOffset(1, bodyOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+packet.Packet.endPacket = function (builder) {
+    var offset = builder.endObject();
+    return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} offset
+ */
+packet.Packet.finishPacketBuffer = function (builder, offset) {
+    builder.finish(offset);
 };
 
 // Exports for Node.js and RequireJS

@@ -29,39 +29,41 @@ namespace PGM_Client
             client = new TcpClient();
             client.Connect("localhost", 12345);
 
+            int[] start = { 8, 2, 3, 4, 5, 5, 5 };
 
-            //string dataToSend = "";
-            //dataToSend += "123";
+            int[] dummy = { 0,2,2,2,2};
+            int[] end = { 8,2,2,2,2,6,6};
 
-            int dataToSend = 100;
-            int[] testData = { 8, 2, 3, 4, 5, 5, 5 };
+            byte[] startBytes = new byte[start.Length * sizeof(int)];
+            byte[] dummyBytes = new byte[dummy.Length * sizeof(int)];
+            byte[] endBytes = new byte[end.Length * sizeof(int)];
 
-            //byte[] data;
-            //data = BitConverter.GetBytes(testData);
-
-            byte[] result = new byte[testData.Length * sizeof(int)];
-            Buffer.BlockCopy(testData, 0, result, 0, result.Length);
+            Buffer.BlockCopy(start, 0, startBytes, 0, startBytes.Length);
             
             NetworkStream writeStream = null;
             writeStream = client.GetStream();
 
-            writeStream.Write(result, 0, result.Length);
+            // send start
+            writeStream.Write(startBytes, 0, startBytes.Length);
 
-            Console.ReadKey();
-
-            /*
+            int count = 0;
             while (true)
             {
                 count++;
-                writeStream.Write(data, 0, data.Length);
+                writeStream.Write(dummyBytes, 0, dummyBytes.Length);
 
                 if (count == 100000)
                 {
                     Console.WriteLine("send : " + count);
                     count = 0;
                 }
+                if (count == 900000)
+                    break;
             }// end loop
-             */
-        }
+            
+
+            Buffer.BlockCopy(endBytes, 0, endBytes, 0, endBytes.Length);
+            writeStream.Write(endBytes, 0, endBytes.Length);
+        }// end method
     }
 }

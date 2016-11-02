@@ -20,7 +20,8 @@ enum Command : int
 	HEALTH_CHECK,
 	MSLIST_REQUEST,
 	PG_START,
-	PG_END
+	PG_END,
+	PG_DUMMY
 }
 
 table Header{
@@ -35,3 +36,12 @@ table Body{
 	cmd: Command;
 	data: string;
 }
+
+table Packet
+{
+	header: Header;
+	body: Body;
+}
+
+
+root_type Packet;

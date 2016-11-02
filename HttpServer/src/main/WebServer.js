@@ -25,6 +25,10 @@ var reqLogger = function findIP(req, res, next) {
 }
 
 function init() {
+
+    test.init();
+
+
     app.use(reqLogger);
 
     app.get('/', function (req, res) {

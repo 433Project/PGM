@@ -5,6 +5,7 @@ const Protocol = require('../types/Protocol');
 
 // class constructor
 function Monitor() {
+
     this.performanceHolder = null;
     this.startTime = 0;
     this.duration = 0;
@@ -24,11 +25,8 @@ function Monitor() {
         console.log('[TCP] monitor 셋팅 완료');
         console.log('============================================');
     }
-
+    // clear map.
     this.clear = function () {
-        // clear map.
-        // stop timer
-
         this.performanceHolder.clear();
         this.stopTimer();
 
@@ -74,7 +72,6 @@ function Monitor() {
         this.packets = 0;
         this.duration++;
     }
-
 
     // from ~ to 의 data를 반환한다.
     // deprecated.
