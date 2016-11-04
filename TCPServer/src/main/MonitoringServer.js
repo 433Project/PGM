@@ -22,143 +22,113 @@ var count = 0;
 var startTime;
 var endTime; 
 
-var targetBuff;
-var tmpBuff;
+var rioSize = 1024;
 
+var client;
+var port = 11433;
+var ip = '10.100.10.6';
+
+var starter;
 
 function start() {
-    console.log("server start . . .id :" + process.env.id);
+    //console.log("server start . . .id :" + process.env.id);
     initialize();
 }
 
-function initialize() {
-    console.log('load server configuration');
+function connect() {
 
-    server = net.createServer(function (socket) {
-        //monitor.setTimer();
-        // 'data' callback이 끝나기 전까지는 data buffer가 비워지지 않는다.
+    client = net.createConnection(11433, '10.100.10.6', () => {
+        ConsoleLogger.SimpleMessage('connect!');
 
-        startTime = process.hrtime();
+        clearInterval(starter);
+    });
 
-        tmpBuff = Buffer.alloc(0);
+    client.on('data', (data) => {
 
-        socket.on('data', function (data) {
+        var idx = 0;
+        var packets = 0;
+        var header;
 
-            var idx = 0;
-            var header;
+        console.log(data.length);
 
-            try {
+        try {
+            while (packets * rioSize< data.length) {
 
-                /*
-                targetBuff = Buffer.alloc(tmpBuff.length + data.length);
+                idx = packets * rioSize;
+                header = Header.bytesToHeader(data.slice(idx, idx + Protocol.HEADER_SIZE));
+                // header null ???? 
+                console.log(header);
 
-                // 이전에 keep해둔 버퍼가 있는 경우
-                if (tmpBuff.length != 0) {
-                    //data.copy(targetBuff, targetBuff.length, 0, data.length);
-                    tmpBuff.copy(targetBuff, 0, 0, tmpBuff.length);    
+                var bodyBuff = new flatbuffers.ByteBuffer(
+                    new Uint8Array(data.slice(idx + Protocol.HEADER_SIZE, idx + Protocol.HEADER_SIZE + header.length)));
+                var body = Packet.Body.getRootAsBody(bodyBuff);
+
+                //idx += header.length;
+                if (body.cmd() == Packet.Command.PG_START) {
+
+                    ConsoleLogger.StartMessage('Monitoring Start');
+
+                    // publish monitoring start message
+                    postMan.publish(new Message(Protocol.CMD_START, body.data()));
                 }
+                else if (body.cmd() == Packet.Command.PG_END) {
+                    console.log('cmd : pg_end');
 
-                data.copy(targetBuff, targetBuff.length, 0, data.length);
+                    // publish monitoring end message
+                    postMan.publish(new Message(Protocol.CMD_END, body.data()));
 
-                */
+                    // end logic
+                    console.log('packets : ' + count);
+                    var diff = process.hrtime(startTime);
+                    endTime = diff[0] * 1e9 + diff[1];
 
-                while (data.length >= Protocol.HEADER_SIZE && idx + Protocol.HEADER_SIZE < data.length) {
+                    ConsoleLogger.EndMessage('Monitoring End');
+                    ConsoleLogger.SimpleMessage('client disconnted');
 
-                    header = Header.bytesToHeader(data.slice(idx, idx + Protocol.HEADER_SIZE));
-                    
-                    idx += Protocol.HEADER_SIZE;
+                    monitor.clear();
 
-                    var bodyBuff = new flatbuffers.ByteBuffer(new Uint8Array(data.slice(idx, idx + header.length)));
-                    var body = Packet.Body.getRootAsBody(bodyBuff);
-                    
-                    if (idx + header.length >= data.length) {
+                    startTime = 0;
+                    count = 0;
+                    endTime = 0;
+                }
+                else if (body.cmd() == Packet.Command.PG_DUMMY) {
+                    // PG_DUMMY
+                    count++;
+                    monitor.getPacket();
+                }
+                packets++;
+            }// end loop
+        }
+        catch (err) {
+            console.log('=================================');
+            console.log('err');
+            console.log('=================================');
+        }
+    });
 
-                        /*
-                        tmpBuff = data.slice(idx, data.length);// keep 
-                        break;
-                        */
-                        break;
-                    }
+    client.on('error', (err) => {
+        ConsoleLogger.SimpleMessage('error!');
+    });
 
-                    idx += header.length;
+    client.on('close', () => {
+        console.log('packets : ' + count);
 
-                    if (body.cmd() == Packet.Command.PG_START) {
+        ConsoleLogger.SimpleMessage('Socket Closed');
+        
+        monitor.clear();
 
-                        ConsoleLogger.StartMessage('Monitoring Start');
+        startTime = 0;
+        count = 0;
+        endTime = 0;
 
-                        // publish monitoring start message
-                        postMan.publish(new Message(Protocol.CMD_START, body.data()));
-                    }
-                    else if (body.cmd() == Packet.Command.PG_END) {
-                        console.log('cmd : pg_end');
-
-                        // publish monitoring end message
-                        postMan.publish(new Message(Protocol.CMD_END, body.data()));
-
-                        // end logic
-                        console.log('packets : ' + count);
-                        var diff = process.hrtime(startTime);
-                        endTime = diff[0] * 1e9 + diff[1];
-
-                        ConsoleLogger.EndMessage('Monitoring End');
-                        ConsoleLogger.SimpleMessage('client disconnted');
-
-                        monitor.clear();
-
-                        startTime = 0;
-                        count = 0;
-                        endTime = 0;
-                    }
-                    else if (body.cmd() == Packet.Command.PG_DUMMY) {
-                        // PG_DUMMY
-                        count++;
-                        monitor.getPacket();
-                    }
-                }// end loop
-
-                
-
-            }
-            catch (err) {
-                /*
-                var date = new Date();
-                var current = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-
-                console.log('=================================');
-                console.log('Monitoring end : ' + current);
-                console.log('=================================');
-                */
-                //console.log('err');
-                //console.log('packets : ' + count);
-            }
-
-        });
-
-        socket.on('error', function (err) {
-            console.log(err);
-        });
-
-        // client와 접속이 끊기는 메시지 출력
-        socket.on('close', function () {
-            console.log('packets : ' + count);
-
-            ConsoleLogger.SimpleMessage('Socket Closed');
-
-            //console.log('client disconnted.');
-
-            monitor.clear();
-
-            startTime = 0;
-            count = 0;
-            endTime = 0;
-        });
-
-    });// end create server
-
-    server.listen(configuration.port, function () {
-        ConsoleLogger.SimpleMessage('[PGM][Monitoring] listening on ' + configuration.port);
+        connect();
     });
 }
 
-module.exports.start = start;
+function initialize() {
+    Buffer.poolSize = rioSize * 1000;
+    connect();
+    //starter = setInterval(connect, 1000*1);
+}
 
+module.exports.start = start;
