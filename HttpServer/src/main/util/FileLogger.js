@@ -1,6 +1,8 @@
 ﻿//const date = require('date-utils');
 
 var fs = require('fs');
+var path = require('path');
+
 
 function FileLogger() {
 
@@ -13,6 +15,8 @@ function FileLogger() {
 
     // create file 
     this.createFile = function () {
+        this.fileName = path.join(__dirname, );
+        console.log('log 파일 경로 : ' + fileName); 
         this.fileName = './logs/' + this.filePrefix + this.formatDate(new Date());
 
         fs.open(this.fileName, 'w', (err, fd) => {
@@ -53,7 +57,7 @@ function FileLogger() {
 
     this.close = () => {
         fs.close(this.fd, () => {
-            console.log('close log file');
+            //console.log('close log file');
         });
     };
 

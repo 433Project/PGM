@@ -47,7 +47,7 @@ namespace PGM_Client
             writeStream.Write(startBytes, 0, startBytes.Length);
 
             int count = 0;
-            while (true)
+            while (false)
             {
                 count++;
                 writeStream.Write(dummyBytes, 0, dummyBytes.Length);
@@ -62,8 +62,8 @@ namespace PGM_Client
             }// end loop
             
 
-            Buffer.BlockCopy(endBytes, 0, endBytes, 0, endBytes.Length);
-            writeStream.Write(endBytes, 0, endBytes.Length);
+            //Buffer.BlockCopy(endBytes, 0, endBytes, 0, endBytes.Length);
+            //writeStream.Write(endBytes, 0, endBytes.Length);
         }// end method
     }
 }

@@ -9,19 +9,6 @@ var packet = packet || {};
 /**
  * @enum
  */
-packet.SrcDstType = {
-    MATCHING_SERVER: 0,
-    MATCHING_CLIENT: 1,
-    ROOM_MANAGER: 2,
-    PACKET_GENERATOR: 3,
-    MONITORING_SERVER: 4,
-    CONFIG_SERVER: 5,
-    CONNECTION_SERVER: 6
-};
-
-/**
- * @enum
- */
 packet.Command = {
     MATCH_REQUEST: 0,
     MATCH_COMPLET: 1,
@@ -30,138 +17,22 @@ packet.Command = {
     MSLIST_REQUEST: 4,
     PG_START: 5,
     PG_END: 6,
-    PG_DUMMY: 7
+    PG_DUMMY: 7,
+    ROOM_CREATE_REQUEST: 8,
+    ROOM_CREATE_RESPONSE: 9,
+    ROOM_JOIN_REQUEST: 10,
+    ROOM_JOIN_RESPONSE: 11,
+    GAME_START: 12,
+    GAME_END: 13
 };
 
 /**
- * @constructor
+ * @enum
  */
-packet.Header = function () {
-    /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-    this.bb = null;
-
-    /**
-     * @type {number}
-     */
-    this.bb_pos = 0;
-};
-
-/**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {packet.Header}
- */
-packet.Header.prototype.__init = function (i, bb) {
-    this.bb_pos = i;
-    this.bb = bb;
-    return this;
-};
-
-/**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {packet.Header=} obj
- * @returns {packet.Header}
- */
-packet.Header.getRootAsHeader = function (bb, obj) {
-    return (obj || new packet.Header).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-};
-
-/**
- * @returns {number}
- */
-packet.Header.prototype.length = function () {
-    var offset = this.bb.__offset(this.bb_pos, 4);
-    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
-};
-
-/**
- * @returns {packet.SrcDstType}
- */
-packet.Header.prototype.srcType = function () {
-    var offset = this.bb.__offset(this.bb_pos, 6);
-    return offset ? /** @type {packet.SrcDstType} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.SrcDstType.MATCHING_SERVER;
-};
-
-/**
- * @returns {number}
- */
-packet.Header.prototype.srcCode = function () {
-    var offset = this.bb.__offset(this.bb_pos, 8);
-    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
-};
-
-/**
- * @returns {packet.SrcDstType}
- */
-packet.Header.prototype.dstType = function () {
-    var offset = this.bb.__offset(this.bb_pos, 10);
-    return offset ? /** @type {packet.SrcDstType} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.SrcDstType.MATCHING_SERVER;
-};
-
-/**
- * @returns {number}
- */
-packet.Header.prototype.dstCode = function () {
-    var offset = this.bb.__offset(this.bb_pos, 12);
-    return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- */
-packet.Header.startHeader = function (builder) {
-    builder.startObject(5);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {number} length
- */
-packet.Header.addLength = function (builder, length) {
-    builder.addFieldInt32(0, length, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {packet.SrcDstType} srcType
- */
-packet.Header.addSrcType = function (builder, srcType) {
-    builder.addFieldInt32(1, srcType, packet.SrcDstType.MATCHING_SERVER);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {number} srcCode
- */
-packet.Header.addSrcCode = function (builder, srcCode) {
-    builder.addFieldInt32(2, srcCode, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {packet.SrcDstType} dstType
- */
-packet.Header.addDstType = function (builder, dstType) {
-    builder.addFieldInt32(3, dstType, packet.SrcDstType.MATCHING_SERVER);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {number} dstCode
- */
-packet.Header.addDstCode = function (builder, dstCode) {
-    builder.addFieldInt32(4, dstCode, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
- */
-packet.Header.endHeader = function (builder) {
-    var offset = builder.endObject();
-    return offset;
+packet.Status = {
+    SUCCESS: 0,
+    FAIL: 1,
+    NONE: 2
 };
 
 /**
@@ -208,11 +79,19 @@ packet.Body.prototype.cmd = function () {
 };
 
 /**
+ * @returns {packet.Status}
+ */
+packet.Body.prototype.status = function () {
+    var offset = this.bb.__offset(this.bb_pos, 6);
+    return offset ? /** @type {packet.Status} */ (this.bb.readInt32(this.bb_pos + offset)) : packet.Status.SUCCESS;
+};
+
+/**
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array}
  */
 packet.Body.prototype.data = function (optionalEncoding) {
-    var offset = this.bb.__offset(this.bb_pos, 6);
+    var offset = this.bb.__offset(this.bb_pos, 8);
     return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
 
@@ -220,7 +99,7 @@ packet.Body.prototype.data = function (optionalEncoding) {
  * @param {flatbuffers.Builder} builder
  */
 packet.Body.startBody = function (builder) {
-    builder.startObject(2);
+    builder.startObject(3);
 };
 
 /**
@@ -233,10 +112,18 @@ packet.Body.addCmd = function (builder, cmd) {
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {packet.Status} status
+ */
+packet.Body.addStatus = function (builder, status) {
+    builder.addFieldInt32(1, status, packet.Status.SUCCESS);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} dataOffset
  */
 packet.Body.addData = function (builder, dataOffset) {
-    builder.addFieldOffset(1, dataOffset, 0);
+    builder.addFieldOffset(2, dataOffset, 0);
 };
 
 /**
@@ -246,99 +133,6 @@ packet.Body.addData = function (builder, dataOffset) {
 packet.Body.endBody = function (builder) {
     var offset = builder.endObject();
     return offset;
-};
-
-/**
- * @constructor
- */
-packet.Packet = function () {
-    /**
-     * @type {flatbuffers.ByteBuffer}
-     */
-    this.bb = null;
-
-    /**
-     * @type {number}
-     */
-    this.bb_pos = 0;
-};
-
-/**
- * @param {number} i
- * @param {flatbuffers.ByteBuffer} bb
- * @returns {packet.Packet}
- */
-packet.Packet.prototype.__init = function (i, bb) {
-    this.bb_pos = i;
-    this.bb = bb;
-    return this;
-};
-
-/**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {packet.Packet=} obj
- * @returns {packet.Packet}
- */
-packet.Packet.getRootAsPacket = function (bb, obj) {
-    return (obj || new packet.Packet).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-};
-
-/**
- * @param {packet.Header=} obj
- * @returns {packet.Header}
- */
-packet.Packet.prototype.header = function (obj) {
-    var offset = this.bb.__offset(this.bb_pos, 4);
-    return offset ? (obj || new packet.Header).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
-};
-
-/**
- * @param {packet.Body=} obj
- * @returns {packet.Body}
- */
-packet.Packet.prototype.body = function (obj) {
-    var offset = this.bb.__offset(this.bb_pos, 6);
-    return offset ? (obj || new packet.Body).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- */
-packet.Packet.startPacket = function (builder) {
-    builder.startObject(2);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} headerOffset
- */
-packet.Packet.addHeader = function (builder, headerOffset) {
-    builder.addFieldOffset(0, headerOffset, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} bodyOffset
- */
-packet.Packet.addBody = function (builder, bodyOffset) {
-    builder.addFieldOffset(1, bodyOffset, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @returns {flatbuffers.Offset}
- */
-packet.Packet.endPacket = function (builder) {
-    var offset = builder.endObject();
-    return offset;
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} offset
- */
-packet.Packet.finishPacketBuffer = function (builder, offset) {
-    builder.finish(offset);
 };
 
 // Exports for Node.js and RequireJS

@@ -58,9 +58,11 @@
     <Compile Include="schema\JavaScript.js" />
     <Compile Include="schema\Packet_generated.js" />
     <Compile Include="src\main\MonitoringServer.js" />
+    <Compile Include="src\main\types\Header.js" />
     <Compile Include="src\main\types\Message.js" />
     <Compile Include="src\main\types\Protocol.js" />
     <Compile Include="src\main\util\ConnectionManger.js" />
+    <Compile Include="src\main\util\ConsoleLogger.js" />
     <Compile Include="src\main\util\Monitor.js" />
     <Compile Include="src\main\util\PostMan.js" />
   </ItemGroup>

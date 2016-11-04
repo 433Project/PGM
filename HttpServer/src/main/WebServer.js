@@ -26,9 +26,6 @@ var reqLogger = function findIP(req, res, next) {
 
 function init() {
 
-    test.init();
-
-
     app.use(reqLogger);
 
     app.get('/', function (req, res) {
@@ -70,10 +67,9 @@ function init() {
         console.log('\n=======================================================');
         console.log('[HTTP] waiting  on ' + config.ip + ':' + config.port + '. . .');
         console.log('\n=======================================================');
-
         //postMan.subscribe();
-
     });
 }
+
 
 module.exports.start = start;

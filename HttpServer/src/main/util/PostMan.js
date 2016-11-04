@@ -33,12 +33,11 @@ PostMan.prototype.init = function () {
             }
 
             PostMan.prototype.channel = ch;
-
-            
             //callback(null);
         });
     });// end amqp
 };// end method
+
 // Consumer
 function consumer(conn) {
     amqp.connect('amqp://localhost', function (err, conn) {
@@ -56,37 +55,6 @@ function consumer(conn) {
     });// end amqp
 }
 
-/*
-PostMan.prototype.subscribe = function (callback) {
-    
-    //var ok = PostMan.prototype.channel.assertQueue(this.queueName, { durable: false });
-    console.log('bbbb');
-    var result = PostMan.prototype.channel.consume(this.queueName, function (msg) {
-        console.log('[HTTP][SUB] read message : ' + msg.content.toString());
-
-        const message = JSON.parse(msg.content);
-
-        if (message.cmd == Protocol.CMD_START) {
-            // start subscribe. . .bb 
-            Test.count = message.data;
-            PostMan.prototype.subscribe();
-        }
-        else if (message.cmd == Protocol.CMD_DUMMY) {
-            //console.log(message.data);
-            Test.dataHolder.addData(message.data);
-        }
-        else {
-            // CMD: CMD_END
-            Test.endTime = new Date();
-            console.log('테스트 종료');
-            console.log('=======================================================');
-        }
-    });
-
-    console.log('consume result : ' + result);
-}
-*/
-
 PostMan.prototype.subscribe = function (callback) {
 
     console.log('bbbb');
@@ -97,16 +65,18 @@ PostMan.prototype.subscribe = function (callback) {
 
         if (message.cmd == Protocol.CMD_START) {
             // start subscribe. . .bb 
-            Test.count = message.data;
+            
+            Test.startTest(message.data);
             PostMan.prototype.subscribe();
         }
         else if (message.cmd == Protocol.CMD_DUMMY) {
             //console.log(message.data);
-            Test.dataHolder.addData(message.data);
+            Test.addData(message.data);
         }
         else {
             // CMD: CMD_END
-            Test.endTime = new Date();
+            //Test.endTime = new Date();
+            Test.endTest();
             console.log('테스트 종료');
             console.log('=======================================================');
         }

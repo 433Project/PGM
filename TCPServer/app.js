@@ -4,6 +4,8 @@
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
+
+
 // if master
 if (cluster.isMaster) {
     // Fork workers.
@@ -30,3 +32,6 @@ else {
 }
 
 
+
+
+//monitoringServer.start();

@@ -1,47 +1,34 @@
 ﻿namespace packet;
 
-
-enum SrcDstType :int
+enum Command : int
 {
-	MATCHING_SERVER = 0,
-	MATCHING_CLIENT,
-	ROOM_MANAGER,
-	PACKET_GENERATOR,
-	MONITORING_SERVER,
-	CONFIG_SERVER,
-    CONNECTION_SERVER
+   MATCH_REQUEST,
+   MATCH_COMPLET,
+   LATENCY,
+   HEALTH_CHECK,
+   MSLIST_REQUEST,
+   PG_START,
+   PG_END,
+   PG_DUMMY,
+   ROOM_CREATE_REQUEST,
+   ROOM_CREATE_RESPONSE,
+   ROOM_JOIN_REQUEST,
+   ROOM_JOIN_RESPONSE,
+   GAME_START,
+   GAME_END,
+
 }
 
-enum Command : int 
+enum Status : int
 {
-	MATCH_REQUEST,
-	MATCH_COMPLET,
-	LATENCY,
-	HEALTH_CHECK,
-	MSLIST_REQUEST,
-	PG_START,
-	PG_END,
-	PG_DUMMY
+  SUCCESS,
+  FAIL,
+  NONE
 }
 
-table Header{
-	length: int;
-	srcType: SrcDstType;
-	srcCode: int;
-	dstType: SrcDstType;
-	dstCode: int;
-}
-
-table Body{
-	cmd: Command;
-	data: string;
-}
-
-table Packet
+table Body
 {
-	header: Header;
-	body: Body;
+   cmd: Command;
+   status: Status;
+   data: string;
 }
-
-
-root_type Packet;
