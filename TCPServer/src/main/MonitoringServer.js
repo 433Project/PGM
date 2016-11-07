@@ -30,6 +30,10 @@ var ip = '10.100.10.6';
 
 var starter;
 
+var tmpBuff;
+var targetBuff;
+
+
 function start() {
     //console.log("server start . . .id :" + process.env.id);
     initialize();
@@ -40,7 +44,9 @@ function connect() {
     client = net.createConnection(11433, '10.100.10.6', () => {
         ConsoleLogger.SimpleMessage('connect!');
 
-        clearInterval(starter);
+        tmpBuff = Buffer.alloc(0);
+
+        //clearInterval(starter);
     });
 
     client.on('data', (data) => {
@@ -49,18 +55,31 @@ function connect() {
         var packets = 0;
         var header;
 
-        console.log(data.length);
-
+        //console.log(data.length);
         try {
+
+            /*
+            if (tmpBuff.length != 0) {
+
+            }
+
+            if (data.length < riosize) {
+                tmpBuff = Buffer.alloc(data.length);
+                data.copy(tmpBuff, 0, 0, data.length);
+                return;
+            }
+            */
+
             while (packets * rioSize< data.length) {
 
                 idx = packets * rioSize;
                 header = Header.bytesToHeader(data.slice(idx, idx + Protocol.HEADER_SIZE));
-                // header null ???? 
-                console.log(header);
+                
+                // console.log(header);
 
                 var bodyBuff = new flatbuffers.ByteBuffer(
                     new Uint8Array(data.slice(idx + Protocol.HEADER_SIZE, idx + Protocol.HEADER_SIZE + header.length)));
+
                 var body = Packet.Body.getRootAsBody(bodyBuff);
 
                 //idx += header.length;
