@@ -12,6 +12,9 @@
     "kill-server": "pm2 delete tcpserver",
     "monitor-server": "pm2 monit",
     "reload-server": "pm2 reload tcpserver",
-    "logs" : "pm2 logs tcpserver"
+    "logs": "pm2 logs tcpserver",
+
+    "start-server-multi-instance": "node app.js 3",
+    "start-server-one-instance": "node app.js 1"
   }
 }

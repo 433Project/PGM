@@ -27,7 +27,7 @@ namespace PGM_Client
         {
             TcpClient client = null;
             client = new TcpClient();
-            client.Connect("localhost", 12345);
+            client.Connect("localhost", 10444);
 
             int[] start = { 8, 2, 3, 4, 5, 5, 5 };
 
@@ -47,7 +47,7 @@ namespace PGM_Client
             writeStream.Write(startBytes, 0, startBytes.Length);
 
             int count = 0;
-            while (false)
+            while (true)
             {
                 count++;
                 writeStream.Write(dummyBytes, 0, dummyBytes.Length);

@@ -13,7 +13,7 @@ function Monitor() {
     this.timer = null;
 
     this.init = function () {
-        console.log('============================================');
+        //console.log('============================================');
         if (this.performanceHolder == null) {
             this.performanceHolder = new Map();
         }
@@ -23,16 +23,16 @@ function Monitor() {
         this.setStartTime(process.hrtime());
 
         console.log('[TCP] monitor 셋팅 완료');
-        console.log('============================================');
+        //console.log('============================================');
     }
     // clear map.
     this.clear = function () {
         this.performanceHolder.clear();
         this.stopTimer();
 
-        console.log('============================================');
+        //console.log('============================================');
         console.log('[TCP] monitor clear');
-        console.log('============================================\n\n\n');
+        //console.log('============================================\n\n\n');
     }
 
     this.setStartTime = function (startTime) {
@@ -41,9 +41,8 @@ function Monitor() {
     }
 
     this.setTimer = function () {
-        console.log('============================================');
+        
         console.log('[TCP] start timer');
-        console.log('============================================');
 
         this.timer = setInterval(this.calculateIndicator.bind(this), 1000); // 1초마다 수행
     }

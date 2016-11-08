@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>PGM Admin</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/react@15/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+        var socket = io.connect('10.100.10.9:53890');
+
+      socket.on('tcp', function (data) {
+          console.log(data);
+          $("#tcp_console").append('<p>'+data+'</p>');
+      });
+
+      socket.on('http', function (data) {
+          console.log(data);
+      });
+
+    </script>
+
+    <style>
+        #service_list{
+            list-style-type:none;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        var ul = ""
+        var msg = [];
+        msg.push('stopped');
+        msg.push('running');
+
+        var button = "<button>start</button>"
+        function loadServiceList() {
+            $.ajax({
+                url: '/service',
+                type: 'GET',
+                success: (data) => {
+                    console.log(data);
+
+                    $("#service_list").empty();
+                    for (var idx in data) {
+                        $("#service_list").append("<li>" + data[idx].name +"</li>");
+                    }
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert('서비스 리스트 로드 에러');
+                }
+            });
+        };
+
+        function callService(){
+            
+        };
+
+        function clickHTTPBtn() {
+            $.ajax({
+                url: '/http',
+                type: 'GET',
+                success: (data) => {
+                    alert(data);
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert('서비스 리스트 로드 에러');
+                }
+            });
+        };
+
+        function startTCP(instance) {
+            
+            var state = $("#tcpState").val();
+            
+            console.log('tcp state : ' + state)
+
+            if (state != 0) {
+                // action : start            
+                alert('tcp server is running');
+                return;
+            }
+
+            state = 1;            
+
+            $.ajax({
+                url: '/tcp/' + state + '/' + instance,
+                type: 'GET',
+                success: (data) => {
+                    alert(data);
+                    $("#tcpState").val(state);
+                    $("#tcpState").text(msg[state]);
+
+//                    document.write("\n");
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert('tcp server start error');
+                }
+            });
+        };
+
+        function stopTCP() {
+            var state = $("#tcpState").val();
+
+            if (state != 1) {
+                alert('tcp server is stopped');
+                return;
+            }
+
+            state = 0;
+
+            $.ajax({
+                url: '/tcp/' + state+'/0',
+                type: 'GET',
+                success: (data) => {
+                    alert(data);
+                    $("#tcpState").val(state);
+                    $("#tcpState").text(msg[state]);
+                    $("#tcp_console").empty();
+                    //            document.write("\n");
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert('서버 킬 에러 ');
+                }
+            });
+        }
+        // ---- jquery
+        $(() => {
+            //loadServiceList();
+        });
+    </script>
+    
+
+    <h1>귀찮음. 근데 아직 쓰지마</h1>
+
+    
+    <div>
+        <ul id="service_list"></ul>
+    </div>
+
+    <h1>tcp server</h1>
+    <div></div>
+    <p id="tcpState" value="0" style="color:red;">stopped</p>
+    <button id="btnTCP" onclick="startTCP(1)"> start tcp server : 1 instance</button>
+    <button id="btnTCP" onclick="startTCP(4)"> start tcp server : multi instance</button>
+    <button id="btnTCP" onclick="stopTCP()">stop tcp server</button>
+
+    <div id="tcp_console" style="width:700px; height:500px; overflow:scroll;"></div>
+
+    <h1>http server</h1>
+    <div id="http_console" style="width:400px;">
+
+        준비중 . . .
+    </div>
+
+    <button id="btnHTTP" onclick="clickHTTPBtn()"> start http server</button>
+    
+</body>
+</html>
