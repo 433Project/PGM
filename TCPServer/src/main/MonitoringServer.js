@@ -2,8 +2,6 @@
 var net = require('net');
 const dgram = require('dgram');
 const udpServer = dgram.createSocket('udp4');
-
-
 var process = require('process');
 var path = process.cwd();
 
@@ -23,7 +21,6 @@ var monitor = require('./util/Monitor.js');
 const postMan = require('./util/PostMan.js');
 //---------- Common Util
 var ConsoleLogger = require('./util/ConsoleLogger');
-
 
 //--------------------- local variable
 var isStart = false;
@@ -98,12 +95,14 @@ function connect() {
 
                     // publish monitoring start message
                     //postMan.publish(new Message(Protocol.CMD_START, body.data()));
+                    postMan.publish(new Message(Protocol.CMD_START, 1));
                 }
                 else if (body.cmd() == Packet.Command.PG_END) {
                     console.log('cmd : pg_end');
 
                     // publish monitoring end message
                     //postMan.publish(new Message(Protocol.CMD_END, body.data()));
+                    postMan.publish(new Message(Protocol.CMD_END, 1));
 
                     // end logic
                     ConsoleLogger.SimpleMessage('packets : ' + count);
@@ -119,16 +118,17 @@ function connect() {
                     // PG_DUMMY
                     console.log('dummy packet : ' + count);
                     count++;
+                    // inc count 
                     monitor.getPacket();
                 }
+                packets++;//?
 
-                packets++;
             }// end loop
         }
         catch (err) {
             console.error(err);
         }
-    });
+    });// end data 
 
     client.on('error', (err) => {
         ConsoleLogger.SimpleMessage(err);
@@ -167,20 +167,17 @@ function listen() {
 
         socket.on('data', (data) => {
 
-            dataCount++;
-
             var idx = 0;
             var packets = 0;
             var header;
 
-            //console.log(data.length);
             try {
                 targetBuff = Buffer.alloc(tmpBuff.length + data.length);
 
                 // 아직 rio 1packet이 도착하지 않은 경우, 보존시킨다.
                 if (targetBuff.length < 100) {
-                    //console.log('targetbuff length : ' + targetBuff.length);
-                    //console.log('왜 이게 걸리지?');
+                    console.log('targetbuff length : ' + targetBuff.length);
+
                     tmpBuff = Buffer.alloc(data.length);
                     data.copy(tmpBuff, 0, 0, data.length);
                     return;
@@ -194,16 +191,9 @@ function listen() {
                 tmpBuff = Buffer.alloc(0);
 
                 // 내 tcp버퍼에 여러 패킷이 올 수도 있음.
-                while (packets * 100 + Protocol.HEADER_SIZE < targetBuff.length) {
-
+                while (packets * 100 < targetBuff.length) {
                     idx = packets * 100;
                     header = Header.bytesToHeader(targetBuff.slice(idx, idx + Protocol.HEADER_SIZE));
-
-                    if (idx + Protocol.HEADER_SIZE + header.length > targetBuff.length) {
-                        tmpBuff = Buffer.alloc((targetBuff.length - idx) + 1);
-                        data.copy(tmpBuff, 0, idx, data.length);
-                        return; 
-                    }
 
                     var bodyBuff = new flatbuffers.ByteBuffer(
                         new Uint8Array(targetBuff.slice(idx + Protocol.HEADER_SIZE, idx + Protocol.HEADER_SIZE + header.length)));
@@ -212,23 +202,22 @@ function listen() {
 
                     //idx += header.length;
                     if (body.cmd() == Packet.Command.PG_START) {
-
                         ConsoleLogger.StartMessage('Monitoring Start');
+
                         // publish monitoring start message
-                        postMan.publish(new Message(Protocol.CMD_START, body.data()));
+                        //postMan.publish(new Message(Protocol.CMD_START, body.data()));
+                        postMan.publish(new Message(Protocol.CMD_START, 1));
                     }
                     else if (body.cmd() == Packet.Command.PG_END) {
                         console.log('cmd : pg_end');
 
                         // publish monitoring end message
-                        postMan.publish(new Message(Protocol.CMD_END, body.data()));
+                        //postMan.publish(new Message(Protocol.CMD_END, body.data()));
+                        postMan.publish(new Message(Protocol.CMD_END, 1));
 
                         // end logic
-                        console.log('packets : ' + count);
-
+                        ConsoleLogger.SimpleMessage('packets : ' + count);
                         ConsoleLogger.EndMessage('Monitoring End');
-                        ConsoleLogger.SimpleMessage('client disconnted');
-                        ConsoleLogger.SimpleMessage('data counts : ' + dataCount);
 
                         monitor.clear();
 
@@ -238,18 +227,15 @@ function listen() {
                     }
                     else if (body.cmd() == Packet.Command.PG_DUMMY) {
                         // PG_DUMMY
+                        console.log('dummy packet : ' + count);
                         count++;
                         monitor.getPacket();
                     }
-                    else {
-                        postMan.publish(new Message(Protocol.CMD_END, 'asdf'));
-                    }
-
                     packets++;
                 }// end loop
             }
             catch (err) {
-                console.log(err);                
+                console.error(err);
             }
         });
     });
@@ -258,7 +244,6 @@ function listen() {
         console.log('listen . . .');
     });
 };
-
 
 function testListen() {
 

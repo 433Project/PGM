@@ -32,24 +32,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="lib\flatbuffersjs.js" />
-    <Compile Include="src\main\types\Protocol.js" />
-    <Compile Include="src\main\types\Test.js" />
-    <Compile Include="src\main\util\CommandHandler.js" />
-    <Compile Include="src\main\util\ConsoleLogger.js" />
+    <Compile Include="middlewares\ReqLogger.js" />
+    <Compile Include="src\main\util\AppLogger.js" />
     <Compile Include="src\main\util\DataHolder.js" />
     <Compile Include="src\main\util\FileLogger.js" />
     <Compile Include="src\main\util\PostMan.js" />
-    <Compile Include="src\main\WebServer.js" />
     <Content Include="index.html" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="schema\Packet.fbs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
-    <Folder Include="lib\" />
-    <Folder Include="schema\" />
+    <Folder Include="middlewares\" />
     <Folder Include="resources\" />
     <Folder Include="resources\css\" />
     <Folder Include="resources\images\" />

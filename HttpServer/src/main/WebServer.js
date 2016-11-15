@@ -44,28 +44,23 @@ function init() {
         console.log('from,to =>' + from + ',' + to);
 
         var result = test.dataHolder.getData(from, to);
-        //console.log(result);
         res.send(JSON.stringify(result));
     });
-
+    
+    /*    
     app.get('/pub/:msg', function (req, res) {
         var msg = req.params.msg;
         console.log(msg);
         postMan.publish(msg);
     });
-
-    app.get('/sub', function (req, res){
-        postMan.subscribe();
-    })
+    */
 
     app.get('/test', function (req, res) {
-
         res.sendFile(test.getLogPath(), (err) => {
             console.error(err);
         });
-
     });
-
+    
     app.listen(config.port, config.ip, function () {
         console.log('\n=======================================================');
         console.log('[HTTP] waiting  on ' + config.ip + ':' + config.port + '. . .');

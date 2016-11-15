@@ -1,6 +1,4 @@
-﻿//const date = require('date-utils');
-
-var fs = require('fs');
+﻿var fs = require('fs');
 var path = require('path');
 
 
@@ -9,7 +7,7 @@ function FileLogger() {
     this.filePrefix = 'test';
     this.enconding = 'utf8';
     this.fileName='';
-    this.fd;
+    this.fd=0;
 
     this.init = function () { }
 
@@ -33,10 +31,26 @@ function FileLogger() {
 
     // write log to file 
     this.writeLog = function (msg) {
-        fs.write(this.fd, this.format(msg), this.encoding, function (err) {
-            if (err) {
-                console.error(err);
-            }
+
+        if (this.fd != 0) {
+            // file opend.
+
+            fs.write(this.fd, this.format(msg), this.encoding, function (err) {
+                if (err) {
+                    console.error(err);
+                }
+            });
+        }
+        else {
+            // file is not initialized
+            this.createFile();
+        }
+ 
+    };
+
+    this.close = () => {
+        fs.close(this.fd, () => {
+            //console.log('close log file');
         });
     };
 
@@ -55,12 +69,6 @@ function FileLogger() {
         return str;
     }
 
-    this.close = () => {
-        fs.close(this.fd, () => {
-            //console.log('close log file');
-        });
-    };
-
     this.formatDate = (date) => {
 
         var d = new Date(date),
@@ -73,9 +81,7 @@ function FileLogger() {
 
         return [year, month, day].join('-');
     };
-
 }
 
 var instance = new FileLogger();
-
 module.exports = instance;

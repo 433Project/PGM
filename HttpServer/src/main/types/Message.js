@@ -1,5 +1,4 @@
-﻿
-function Message(cmd, data){
+﻿function Message(cmd, data){
     this.cmd = cmd;
     this.data = data;
 

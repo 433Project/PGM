@@ -42,12 +42,4 @@
 
 var instance = new DataHolder();
 instance.init();
-
 module.exports = instance;
-/*
-module.exports.addData = instance.addData;
-module.exports.getData = instance.addData;
-module.exports.clearData = instance.clearData;
-*/
-
-

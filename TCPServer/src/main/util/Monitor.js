@@ -30,9 +30,7 @@ function Monitor() {
         this.performanceHolder.clear();
         this.stopTimer();
 
-        //console.log('============================================');
         console.log('[TCP] monitor clear');
-        //console.log('============================================\n\n\n');
     }
 
     this.setStartTime = function (startTime) {
@@ -65,8 +63,8 @@ function Monitor() {
         this.performanceHolder.set(this.duration, this.packets);
 
         // publish
-        PostMan.publish(new Message(Protocol.CMD_DUMMY, { "duration": this.duration, "packets": this.packets }) );
-        console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
+        PostMan.publish(new Message(Protocol.CMD_DATA, { "duration": this.duration, "packets": this.packets }) );
+        //console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
 
         this.packets = 0;
         this.duration++;

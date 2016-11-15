@@ -1,4 +1,5 @@
 ﻿var amqp = require('amqplib/callback_api');
+var Message = require('../types/Message');
 
 function PostMan() {
     this.queueName = 'asdf';
@@ -9,7 +10,7 @@ PostMan.prototype.queueName = 'asdf';
 
 PostMan.prototype.channel = null;
 PostMan.prototype.init = function () {
-    
+
     console.log('[TCP] message queue 초기화\n');;
 
     amqp.connect('amqp://localhost', function (err, conn) {
@@ -20,7 +21,7 @@ PostMan.prototype.init = function () {
             }
             else {
                 ch.assertQueue(PostMan.prototype.queueName, { durable: false });
-                
+
                 console.log('[TCP] queue 생성 완료');
                 console.log('[TCP] message queue 초기화 완료');
             }
@@ -29,12 +30,11 @@ PostMan.prototype.init = function () {
     });// end amqp
 };// end method
 
-PostMan.prototype.publish = (msg) => {
+PostMan.prototype.publish = (packet) => {
     console.log('[TCP][PUB] send message : ' + msg);
-    console.log(PostMan.prototype.queueName);
+
     PostMan.prototype.channel.sendToQueue(PostMan.prototype.queueName, new Buffer(JSON.stringify(msg), this.encoding));
 };
-
 
 var postMan = new PostMan();
 postMan.init();

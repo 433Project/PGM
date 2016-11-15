@@ -31,15 +31,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="config\pm2_config.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="schema\Packet.fbs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
-    <Folder Include="lib\" />
-    <Folder Include="schema\" />
     <Folder Include="src\" />
     <Folder Include="src\main\" />
     <Folder Include="src\main\types\" />
@@ -58,15 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="schema\JavaScript.js" />
-    <Compile Include="schema\Packet_generated.js" />
     <Compile Include="src\main\MonitoringServer.js" />
-    <Compile Include="src\main\types\Header.js" />
-    <Compile Include="src\main\types\Message.js" />
-    <Compile Include="src\main\types\Protocol.js" />
-    <Compile Include="src\main\util\ConnectionManger.js" />
-    <Compile Include="src\main\util\ConsoleLogger.js" />
-    <Compile Include="src\main\util\Monitor.js" />
     <Compile Include="src\main\util\PostMan.js" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->

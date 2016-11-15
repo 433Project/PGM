@@ -1,4 +1,4 @@
-﻿const Protocol = require('../types/Protocol');
+﻿const Protocol = require('../types/Protocol').Protocol;
 const Test = require('../types/Test');
 
 // RabbitMQ message의 command handle

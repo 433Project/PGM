@@ -10,10 +10,14 @@ function Test() {
     this.startTime;
     this.endTime;
 
+
     this.dataHolder; 
 
     this.logPath;
     
+    
+    this.state;
+
     this.init = () => {
         this.count = 0;
         this.arrivedCount = 0;
@@ -23,7 +27,6 @@ function Test() {
         this.dataHolder = DataHolder;
         this.logPath = '';
     };
-
 
     // 모니터링 시작
     // 초기화
@@ -45,8 +48,6 @@ function Test() {
     // 모니터링 종료
     // clearing
     this.endTest = () => {
-        //this.clear();
-
         // 종료 시간 설정
         this.endTime = new Date();
         FileLogger.close();
@@ -55,7 +56,8 @@ function Test() {
     this.getLogPath = function () {
         return this.logPath;
     }
-    this.setLogPath = function (s) {
+    //?
+    this.setLogPath = function (path) {
         this.logPath = path;
     }
 

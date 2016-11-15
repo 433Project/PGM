@@ -2,14 +2,12 @@
 
 const dataHolder = require('./DataHolder.js');
 const async = require('async');
-const Protocol = require('../types/Protocol');
+const Protocol = require('../types/Protocol').Protocol;
 var Test = require('../types/Test');
 const ConsoleLogger = require('./ConsoleLogger');
 
 // rabbitmq receiver
-function PostMan() {
-    this.conn = null;
-};
+function PostMan() {};
 
 PostMan.prototype.queueName = 'asdf';
 PostMan.prototype.channel = null;
@@ -32,11 +30,30 @@ PostMan.prototype.init = function (callback) {
 };// end method
 
 PostMan.prototype.subscribe = function (callback) {
-    console.log('bbbb');
 
     PostMan.prototype.channel.consume(PostMan.prototype.queueName, (msg) => {
-        ConsoleLogger.SimpleMessage(msg.content);
-    }, { noAck: true });
+
+        var message = JSON.parse(msg.content);
+
+        var message = new Message();
+        if (message.cmd = Protocol.CMD_START) {
+            // start test
+            Test.startTest();
+        }
+        else if (message.cmd == Protocol.CMD_END) {
+            // dummy packet
+            Test.endTest();
+        }
+        else if (message.cmd == Protocol.CMD_DATA) {
+            // handle data(pps)
+            Test.addData(message.data);
+        }
+        else {
+            // not defined packet
+            // error
+            
+        }
+    }, { noAck: true }); // end subscribe
 }
 
 var postMan = new PostMan();
