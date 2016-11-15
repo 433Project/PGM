@@ -1,15 +1,11 @@
 ﻿var amqp = require('amqplib/callback_api');
 
 function PostMan() {
-    this.queueName = 'pgm3';
+    this.queueName = 'asdf';
     this.encoding = 'utf8';
-
-    // publish message
-    this.publish = function (msg) {
-        //console.log('[TCP][PUB] send message : ' + msg);
-        this.channel.sendToQueue(this.queueName, new Buffer(JSON.stringify(msg), this.encoding));
-    }
 };
+
+PostMan.prototype.queueName = 'asdf';
 
 PostMan.prototype.channel = null;
 PostMan.prototype.init = function () {
@@ -21,10 +17,9 @@ PostMan.prototype.init = function () {
 
             if (err) {
                 console.log('[TCP] 초기화 에러.' + err);
-    
             }
             else {
-                ch.assertQueue(this.queueName, { durable: false });
+                ch.assertQueue(PostMan.prototype.queueName, { durable: false });
                 
                 console.log('[TCP] queue 생성 완료');
                 console.log('[TCP] message queue 초기화 완료');
@@ -33,6 +28,12 @@ PostMan.prototype.init = function () {
         });
     });// end amqp
 };// end method
+
+PostMan.prototype.publish = (msg) => {
+    console.log('[TCP][PUB] send message : ' + msg);
+    console.log(PostMan.prototype.queueName);
+    PostMan.prototype.channel.sendToQueue(PostMan.prototype.queueName, new Buffer(JSON.stringify(msg), this.encoding));
+};
 
 
 var postMan = new PostMan();

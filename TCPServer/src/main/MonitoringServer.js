@@ -9,7 +9,7 @@ var path = process.cwd();
 
 //---------- Flat Buffer 
 var flatbuffers = require('../../lib/flatbuffersjs.js').flatbuffers;
-var Packet = require('../../schema/Packet_generated.js').packet;
+var Packet = require('../../schema/Packet_generated.js').fb;
 var builder = new flatbuffers.Builder(0);
 
 //---------- RabbitMQ Protocol 
@@ -42,7 +42,6 @@ var starter;
 
 var tmpBuff;
 var targetBuff;
-
 
 var dataCount = 0;
 
@@ -82,15 +81,11 @@ function connect() {
 
             // tmpBUff 초기화 
             tmpBuff = Buffer.alloc(0);
-            //console.log(targetBuff.length);
-            //console.log(targetBuff);
 
             // 내 tcp버퍼에 여러 패킷이 올 수도 있음.
             while (packets * 100 < targetBuff.length) {
                 idx = packets * 100;
                 header = Header.bytesToHeader(targetBuff.slice(idx, idx + Protocol.HEADER_SIZE));
-                
-                //console.log(header);
 
                 var bodyBuff = new flatbuffers.ByteBuffer(
                     new Uint8Array(targetBuff.slice(idx + Protocol.HEADER_SIZE, idx + Protocol.HEADER_SIZE + header.length)));
@@ -100,14 +95,15 @@ function connect() {
                 //idx += header.length;
                 if (body.cmd() == Packet.Command.PG_START) {
                     ConsoleLogger.StartMessage('Monitoring Start');
+
                     // publish monitoring start message
-                    postMan.publish(new Message(Protocol.CMD_START, body.data()));
+                    //postMan.publish(new Message(Protocol.CMD_START, body.data()));
                 }
                 else if (body.cmd() == Packet.Command.PG_END) {
                     console.log('cmd : pg_end');
 
                     // publish monitoring end message
-                    postMan.publish(new Message(Protocol.CMD_END, body.data()));
+                    //postMan.publish(new Message(Protocol.CMD_END, body.data()));
 
                     // end logic
                     ConsoleLogger.SimpleMessage('packets : ' + count);
@@ -121,7 +117,7 @@ function connect() {
                 }
                 else if (body.cmd() == Packet.Command.PG_DUMMY) {
                     // PG_DUMMY
-                    //console.log('dummy packet : ' + count);
+                    console.log('dummy packet : ' + count);
                     count++;
                     monitor.getPacket();
                 }
@@ -154,6 +150,9 @@ function connect() {
 }
 
 function listen() {
+
+    Buffer.poolSize = 100 * 2000;
+
     server = net.createServer((socket) => {
         
         tmpBuff = Buffer.alloc(0);
@@ -242,6 +241,9 @@ function listen() {
                         count++;
                         monitor.getPacket();
                     }
+                    else {
+                        postMan.publish(new Message(Protocol.CMD_END, 'asdf'));
+                    }
 
                     packets++;
                 }// end loop
@@ -253,6 +255,36 @@ function listen() {
     });
 
     server.listen(10444, () => {
+        console.log('listen . . .');
+    });
+};
+
+
+function testListen() {
+
+    Buffer.poolSize = 100 * 2000;
+
+    server = net.createServer((socket) => {
+
+        tmpBuff = Buffer.alloc(0);
+
+        socket.on('error', (err) => {
+            ConsoleLogger.SimpleMessage(err);
+        });
+
+        socket.on('close', () => {
+            ConsoleLogger.SimpleMessage('data event counts : ' + dataCount);
+        });
+
+        socket.on('data', (data) => {
+
+            postMan.publish('adf');
+
+        });
+    });
+
+    server.listen(10444, () => {
+        postMan.init();
         console.log('listen . . .');
     });
 };
@@ -347,24 +379,19 @@ function udpListen() {
             console.log(err);
             console.log('=================================');
         }
-
-
-
-
     });
 
     udpServer.bind(10433);
 }
 
 function initialize() {
-    Buffer.poolSize = 100 * 2000;
-
     
     connect();
-
     //listen();
     //udpListen();
     //starter = setInterval(connect, 1000*1);
 }
 
 module.exports.start = start;
+module.exports.connect = connect;
+module.exports.listen = testListen;

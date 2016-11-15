@@ -16,7 +16,7 @@ function FileLogger() {
     // create file 
     this.createFile = function () {
         //this.fileName = path.join(__dirname, );
-        console.log('log 파일 경로 : ' + fileName); 
+        console.log('log 파일 경로 : ' + this.fileName); 
         this.fileName = './logs/' + this.filePrefix + this.formatDate(new Date());
 
         fs.open(this.fileName, 'w', (err, fd) => {

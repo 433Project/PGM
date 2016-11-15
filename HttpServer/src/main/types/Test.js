@@ -1,6 +1,7 @@
 ﻿var DataHolder = require('../util/DataHolder');
 var FileLogger = require('../util/FileLogger');
 
+// 테스트 1개에 대한 Prototype
 function Test() {
 
     this.count;

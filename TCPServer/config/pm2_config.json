@@ -1,0 +1,13 @@
+﻿{
+  "apps": [{
+    "name": "tcpserver",
+    "script": "app.js",
+    "watch": false,
+    "env": {
+      "NODE_ENV": "production",
+      "API_PORT": 4000
+    },
+    "exec_mode": "cluster",
+    "instances": 0
+  }]
+}

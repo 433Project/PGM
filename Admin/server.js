@@ -102,13 +102,14 @@ app.get('/tcp/:state/:instance', (req, res) => {
             });
 
             console.log(tcpServerInstance.pid);
+
             tcpServerInstance.on('message', (msg, handle) => {
                 console.log('?');
             });
 
             tcpServerInstance.on('exit', (code, signal) => {
                 console.log('exit' + signal);
-                //tcpServerInstance.kill();
+                tcpServerInstance = null;
             });
 
             tcpServerInstance.on('close', (code, signal) => {
@@ -142,14 +143,10 @@ app.get('/tcp/:state/:instance', (req, res) => {
             tcpServerInstance.stderr.pause();
             tcpServerInstance.stdout.pause();
             tcpServerInstance.kill('SIGINT');
+            
             // kill process
             //child_process.exec('taskkill /f /pid ' + tcpServerInstance.pid);
-
-            tcpServerInstance = null;
-
-            res.send('shutdown');
-
-            
+            res.send('shutdown');            
         }
         else
             res.send('shutdown error');
@@ -168,7 +165,6 @@ io.on('connection', (socket) => {
 
     clientList.add(socket);
 });
-
 /*
 app.listen(port, () => {
     console.log('listen');

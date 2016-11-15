@@ -36,6 +36,7 @@
     <Compile Include="src\main\types\Protocol.js" />
     <Compile Include="src\main\types\Test.js" />
     <Compile Include="src\main\util\CommandHandler.js" />
+    <Compile Include="src\main\util\ConsoleLogger.js" />
     <Compile Include="src\main\util\DataHolder.js" />
     <Compile Include="src\main\util\FileLogger.js" />
     <Compile Include="src\main\util\PostMan.js" />

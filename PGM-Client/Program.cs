@@ -61,7 +61,6 @@ namespace PGM_Client
                     break;
             }// end loop
             
-
             //Buffer.BlockCopy(endBytes, 0, endBytes, 0, endBytes.Length);
             //writeStream.Write(endBytes, 0, endBytes.Length);
         }// end method

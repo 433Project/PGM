@@ -4,24 +4,25 @@ var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
 // var process = require('process');
-
-var isClustered = process.argv[2];
-//console.log(process.argv[2]);
+var type = process.argv[2];
+var isClustered = process.argv[3];
 
 var maxCluster = numCPUs;
 
+// run server as client - connect
+if (type == 'c') {
+    monitoringServer.connect();
+}
+else {
+    // run server as server - listen
+    monitoringServer.listen();
+}
+
+
+/*
 // one instance
 if (isClustered == '1') {
-    process.on('SIGINT', function () {
-        console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
-        // some other closing procedures go here
-        process.exit();
-    });
-
     monitoringServer.start();
-
-    
-
 }
 else {
 // multi instance
@@ -31,8 +32,6 @@ else {
 
     if (cluster.isMaster) {
         // Fork workers.
-
-
         for (var i = 0; i < isClustered; i++) {
             var worker = cluster.fork();
 
@@ -55,3 +54,4 @@ else {
     }
 }
 
+*/
