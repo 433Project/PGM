@@ -1,5 +1,8 @@
 ﻿//----- node mudule
-var express = require('express');
+//var express = require('express');
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 var path = require('path');
 var async = require('async');
 
@@ -8,12 +11,17 @@ var config = require('./util/Configuration.js').web;
 var postMan = require('./util/PostMan.js');
 var dataHolder = require('./util/DataHolder.js');
 var test = require('./types/Test');
+var ConsoleLogger = require('./util/ConsoleLogger');
+var clientHolder = require('./util/ClientHolder');
 
-var app = express();
+//----- app variable
+var client;
 
 function start() {
-    //fileLogger.createFile();
-    init();
+   
+    httpInit();
+    ioInit();
+
     test.init();
     async.series([postMan.init, postMan.subscribe]);
 }
@@ -23,9 +31,8 @@ var reqLogger = function findIP(req, res, next) {
     console.log('[HTTP][' + req.originalUrl + '] IP : ' + req.ip);
     next();
 }
-    
-// webserver init
-function init() {
+
+var httpInit = () => {
 
     app.use(reqLogger);
 
@@ -35,38 +42,38 @@ function init() {
         res.sendFile(path.join(__dirname, '..', '..', 'index.html'));
     });
 
-    // /info?from,to
     app.get('/info', function (req, res) {
 
-        var from = req.query.from; 
+        var from = req.query.from;
         var to = req.query.to;
-
-        console.log('from,to =>' + from + ',' + to);
 
         var result = test.dataHolder.getData(from, to);
         res.send(JSON.stringify(result));
     });
-    
-    /*    
-    app.get('/pub/:msg', function (req, res) {
-        var msg = req.params.msg;
-        console.log(msg);
-        postMan.publish(msg);
-    });
-    */
 
     app.get('/test', function (req, res) {
-        res.sendFile(test.getLogPath(), (err) => {
-            console.error(err);
+        res.download('./logs/test2016-11-15.txt', 'asdfasdfad.txt', (err) => {
+            console.log(err);
         });
     });
-    
-    app.listen(config.port, config.ip, function () {
-        console.log('\n=======================================================');
-        console.log('[HTTP] waiting  on ' + config.ip + ':' + config.port + '. . .');
-        console.log('\n=======================================================');
+
+    server.listen(config.port, config.ip, () => {
+        ConsoleLogger.SimpleMessage('listen');
     });
 }
 
+var ioInit = () => {
+    io.on('connection', function (socket) {
+
+        ConsoleLogger.SimpleMessage('client connect');
+
+        socket.on('disconnect', () => {
+            ConsoleLogger.SimpleMessage('client disconnect');
+            clientHolder.client = null;
+                
+        });
+        clientHolder.client = socket;
+    });
+} 
 
 module.exports.start = start;

@@ -1,10 +1,14 @@
-﻿const amqp = require('amqplib/callback_api');
-
-const dataHolder = require('./DataHolder.js');
+﻿//---- node module
+const amqp = require('amqplib/callback_api');
 const async = require('async');
+//---- custom module
+const dataHolder = require('./DataHolder.js');
+
 const Protocol = require('../types/Protocol').Protocol;
 var Test = require('../types/Test');
 const ConsoleLogger = require('./ConsoleLogger');
+var clientHolder = require('./ClientHolder');
+
 
 // rabbitmq receiver
 function PostMan() {};
@@ -43,6 +47,7 @@ PostMan.prototype.subscribe = function (callback) {
         else if (message.cmd == Protocol.CMD_END) {
             // dummy packet
             Test.endTest();
+            clientHolder.emit('msg', { 'cmd': Protocol.CMD_END, 'data': 0 });
         }
         else if (message.cmd == Protocol.CMD_DATA) {
             // handle data(pps)

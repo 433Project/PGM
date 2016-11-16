@@ -10,12 +10,11 @@ function Test() {
     this.startTime;
     this.endTime;
 
-
     this.dataHolder; 
 
     this.logPath;
-    
-    
+    this.fileName;
+
     this.state;
 
     this.init = () => {
@@ -59,6 +58,10 @@ function Test() {
     //?
     this.setLogPath = function (path) {
         this.logPath = path;
+    }
+    
+    this.getFileName = ()=> { 
+        return this.fileName;
     }
 
     this.clear = () => {

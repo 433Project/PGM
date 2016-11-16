@@ -7,6 +7,22 @@
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+
+        var socket = io.connect('10.100.10.9:12346');
+        socket.on('msg', (msg) => {
+            if (msg.cmd == 3) {
+                // test 
+                console.log('cmd : test end');
+                $("#btnLogFileDownload").css('disabled','false');
+            }
+            else {
+                console.log('cmd : error');
+            }
+        });
+
+    </script>
     <style>
       .axis--x path {
           display: none;
@@ -24,6 +40,7 @@
         $(function () {
             $("#btnLogFileDownload").click(() => {
 
+                /*
                 $.ajax({
                     url: '/test',
                     type: 'get',
@@ -34,6 +51,10 @@
                         console.log(err);
                     }
                 });
+                */
+
+                window.location = '/test';
+
             });// end ajax
         });
     </script>
@@ -89,7 +110,6 @@
             .attr("class", "line")
             .attr("d", line);
         
-
         ///====================================================================================
         ///====================================================================================
         ///====================================================================================
@@ -171,5 +191,4 @@
     <button id="btnLogFileDownload">log file download</button>
 
 </body>
-
 </html>
