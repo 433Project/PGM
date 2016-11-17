@@ -1,3 +1,6 @@
 Packet Generator Monitoring Server
 
-all resources are in 'develop' branch
+
+# framework : node.js
+# library : RabbitMQ, winston 
+

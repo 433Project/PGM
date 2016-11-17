@@ -3,10 +3,10 @@ var process = require('process');
 var path = process.cwd();
 var configFile = require('../../../config/local.json');
 
-var parse = function () {
-    return configFile;
-};
+//var parse = function () {
+//    return configFile;
+//};
 
-var config = parse();
+//var config = parse();
 
-module.exports = config;
+module.exports = configFile;

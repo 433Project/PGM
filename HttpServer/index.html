@@ -1,194 +1,73 @@
 ﻿<!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="utf-8" />
     <title>PGM</title>
 
-    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script>
 
         var socket = io.connect('10.100.10.9:12346');
         socket.on('msg', (msg) => {
+
+            console.log(msg);
             if (msg.cmd == 3) {
                 // test 
                 console.log('cmd : test end');
                 $("#btnLogFileDownload").css('disabled','false');
             }
+            else if(msg.cmd == 4){
+
+                console.log('cmd : data');
+                console.log(msg.data);
+
+                $("#logBody").empty();
+
+                for (var item in msg.data) {
+                    //$("#logBody").append('<tr><th>' + msg.data[item].duration + '</th></tr>');
+
+                    $("#logBody").append('<tr>');
+                    $("#logBody").append('<th>');
+                    $("#logBody").append(msg.data[item].duration);
+                    $("#logBody").append('</th>');
+                    $("#logBody").append('<th>');
+                    $("#logBody").append(msg.data[item].packets);
+                    $("#logBody").append('</th>');
+                    $("#logBody").append('</tr>');
+                }// end loop 
+            }
             else {
-                console.log('cmd : error');
+                console.log('cmd : not defined cmd error');
             }
         });
 
     </script>
-    <style>
-      .axis--x path {
-          display: none;
-        }
-
-        .line {
-          fill: none;
-          stroke: steelblue;
-          stroke-width: 1.5px;
-        }
-    </style>
-    <svg width="960" height="500"></svg>
     <script>
 
         $(function () {
             $("#btnLogFileDownload").click(() => {
-
-                /*
-                $.ajax({
-                    url: '/test',
-                    type: 'get',
-                    success: (data) => {
-                        console.log(data);
-                    },
-                    error: (err) => {
-                        console.log(err);
-                    }
-                });
-                */
-
                 window.location = '/test';
-
             });// end ajax
         });
     </script>
-
 </head>
 <body>
-    <script>
-
-        var graphData = [{"duration":0, "packets": 0}];
-
-        var svg = d3.select("svg"),
-            margin = { top: 20, right: 20, bottom: 30, left: 50 },
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        //var parseTime = d3.timeParse("%d-%b-%y");
-
-        var parseTime = d3.timeParse("%S");
-
-        var x = d3.scaleOrdinal().range([10, width]);
-//        var x = d3.scale().range([10, width]);
-
-        var y = d3.scaleLinear()
-            .rangeRound([height, 10]);
-
-        var line = d3.line()
-            .x(function (d) { return x(d.duration); })
-            .y(function (d) { return y(d.packets); });
-
-        //x.domain(d3.extent(graphData, function (d) { return d.duration; }));
-        x.domain(graphData.map(function (d) { return d.duration;}));
-        y.domain(d3.extent(graphData, function (d) { return d.packets; }));
-
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x).tickFormat("d").ticks(5));
-
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y))
-            .append("text")
-            .attr("fill", "#000")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", "0.71em")
-            .style("text-anchor", "end")
-            .text("Packets");
-
-        g.append("path")
-            .data([graphData])
-            .attr("class", "line")
-            .attr("d", line);
-        
-        ///====================================================================================
-        ///====================================================================================
-        ///====================================================================================
-        var from = 0;
-        var to = 0;
-
-        function loadInfo() {
-
-            from = to;
-            to += 3;
-
-            d3.json("/info?from=" + from + "&to=" + to, function (data) {
-
-                for (var item in data) {
-
-                    //data[item].duration = parseTime(data[item].duration);
-                    graphData.push(data[item]);
-                }
-
-                x.domain(d3.extent(graphData, function (d) { return d.duration; }));
-                y.domain(d3.extent(graphData, function (d) { return d.packets; }));
-
-                d3.select("svg").select("g").selectAll("path").remove();
-                d3.select("svg").select(".axis--x").remove();
-                d3.select("svg").select(".axis--y").remove();
-                
-                g.append("path")
-                    .data([graphData])
-                    .attr("class", "line")
-                    .attr("d", line);
-
-                g.append("g")
-                    .attr("class", "axis axis--x")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(x).tickFormat(d3.format("d")).tickSize(10));
-
-                g.append("g")
-                  .attr("class", "axis axis--y")
-                  .call(d3.axisLeft(y))
-                  .append("text")
-                  .attr("fill", "#000")
-                  .attr("transform", "rotate(-90)")
-                  .attr("y", 6)
-                  .attr("dy", "0.71em")
-                  .style("text-anchor", "end")
-                  .text("Packets");
-
-
-                /*
-                g.append("g")
-                    .attr("class", "axis axis--x")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(x));
-
-                g.append("g")
-                    .attr("class", "axis axis--y")
-                    .call(d3.axisLeft(y))
-                    .append("text")
-                    .attr("fill", "#000")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", "0.71em")
-                    .style("text-anchor", "end")
-                    .text("Price ($)");
-
-                g.append("path")
-                    .data([graphData])
-                    .attr("class", "line")
-                    .attr("d", line);
-                */
-
-                
-            });
-        }
-
-        setInterval(loadInfo, 3000);
-    </script>
-
     <button id="btnLogFileDownload">log file download</button>
+    <div id="log">
+        <table>
+            <thead>
+                <tr>
+                    <th>duration</th>
+                    <th>packets</th>
+                </tr>
+                
+            </thead>
+            <tbody id="logBody">
+                
+            </tbody>
+        </table>
 
+    </div>
 </body>
 </html>

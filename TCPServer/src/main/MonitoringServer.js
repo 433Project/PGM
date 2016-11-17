@@ -16,9 +16,10 @@ var Protocol = require('./types/Protocol');
 var Header = require('./types/Header');
 
 //--------- application module
-var configuration = require('./util/Configuration.js').monitoring;
+var configuration = require('./util/Configuration.js');
 var monitor = require('./util/Monitor.js');
 const postMan = require('./util/PostMan.js');
+const logger = require('./util/Logger').logger;
 //---------- Common Util
 var ConsoleLogger = require('./util/ConsoleLogger');
 
@@ -26,31 +27,20 @@ var ConsoleLogger = require('./util/ConsoleLogger');
 var isStart = false;
 var count = 0;
 
-var startTime;
-var endTime; 
 
-var rioSize = 100;
-
-var client;
-var port = 11433;
-var ip = '10.100.10.6';
-
-var starter;
+var rioSize = configuration.connection.max_packet_size;
 
 var tmpBuff;
 var targetBuff;
 
 var dataCount = 0;
-
-function start() {
-    initialize();
-}
+var client = null;
 
 function connect() {
 
-    client = net.createConnection(port, '10.100.10.6', () => {
-
-        ConsoleLogger.SimpleMessage('connect!');
+    client = net.createConnection(configuration.connection.port, configuration.connection.ip, () => {
+        //ConsoleLogger.SimpleMessage('connect!');
+        logger.LOG('connect TO cs');
         tmpBuff = Buffer.alloc(0);
     });
 
@@ -64,7 +54,7 @@ function connect() {
             targetBuff = Buffer.alloc(tmpBuff.length + data.length);
 
             // 아직 rio 1packet이 도착하지 않은 경우, 보존시킨다.
-            if (targetBuff.length < 100) {
+            if (targetBuff.length < rioSize) {
                 console.log('targetbuff length : ' + targetBuff.length);
 
                 tmpBuff = Buffer.alloc(data.length);
@@ -80,8 +70,8 @@ function connect() {
             tmpBuff = Buffer.alloc(0);
 
             // 내 tcp버퍼에 여러 패킷이 올 수도 있음.
-            while (packets * 100 < targetBuff.length) {
-                idx = packets * 100;
+            while (packets * rioSize < targetBuff.length) {
+                idx = packets * rioSize;
                 header = Header.bytesToHeader(targetBuff.slice(idx, idx + Protocol.HEADER_SIZE));
 
                 var bodyBuff = new flatbuffers.ByteBuffer(
@@ -90,14 +80,18 @@ function connect() {
                 var body = Packet.Body.getRootAsBody(bodyBuff);
 
                 //idx += header.length;
-                if (body.cmd() == Packet.Command.PG_START) {
-                    ConsoleLogger.StartMessage('Monitoring Start');
+                if (body.cmd() == Packet.COMMAND.PG_START) {
+                    logger.LOG('Monitoring Start');
+
+                    //--- monitor setting
+                    monitor.init();
+                    monitor.start();
 
                     // publish monitoring start message
                     //postMan.publish(new Message(Protocol.CMD_START, body.data()));
                     postMan.publish(new Message(Protocol.CMD_START, 1));
                 }
-                else if (body.cmd() == Packet.Command.PG_END) {
+                else if (body.cmd() == Packet.COMMAND.PG_END) {
                     console.log('cmd : pg_end');
 
                     // publish monitoring end message
@@ -108,21 +102,18 @@ function connect() {
                     ConsoleLogger.SimpleMessage('packets : ' + count);
                     ConsoleLogger.EndMessage('Monitoring End');
 
+                    monitor.stop();
                     monitor.clear();
 
-                    startTime = 0;
                     count = 0;
-                    endTime = 0;
                 }
-                else if (body.cmd() == Packet.Command.PG_DUMMY) {
+                else if (body.cmd() == Packet.COMMAND.PG_DUMMY) {
                     // PG_DUMMY
-                    console.log('dummy packet : ' + count);
                     count++;
                     // inc count 
                     monitor.getPacket();
                 }
                 packets++;//?
-
             }// end loop
         }
         catch (err) {
@@ -133,7 +124,7 @@ function connect() {
     client.on('error', (err) => {
         ConsoleLogger.SimpleMessage(err);
     });
-
+    
     client.on('close', () => {
         console.log('packets : ' + count);
 
@@ -141,140 +132,19 @@ function connect() {
         
         monitor.clear();
 
-        startTime = 0;
         count = 0;
-        endTime = 0;
-
-        connect();
-    });
+        //connect();
+    });    
 }
 
-function listen() {
-
-    Buffer.poolSize = 100 * 2000;
-
-    server = net.createServer((socket) => {
-        
-        tmpBuff = Buffer.alloc(0);
-
-        socket.on('error', (err) => {
-            ConsoleLogger.SimpleMessage(err);
-        });
-
-        socket.on('close', () => {
-            ConsoleLogger.SimpleMessage('data event counts : ' + dataCount);
-        });
-
-        socket.on('data', (data) => {
-
-            var idx = 0;
-            var packets = 0;
-            var header;
-
-            try {
-                targetBuff = Buffer.alloc(tmpBuff.length + data.length);
-
-                // 아직 rio 1packet이 도착하지 않은 경우, 보존시킨다.
-                if (targetBuff.length < 100) {
-                    console.log('targetbuff length : ' + targetBuff.length);
-
-                    tmpBuff = Buffer.alloc(data.length);
-                    data.copy(tmpBuff, 0, 0, data.length);
-                    return;
-                }
-
-                // 적당한 데이터가 있는 경우.
-                tmpBuff.copy(targetBuff, 0, 0, tmpBuff.length);
-                data.copy(targetBuff, tmpBuff.length, 0, data.length);
-
-                // tmpBUff 초기화 
-                tmpBuff = Buffer.alloc(0);
-
-                // 내 tcp버퍼에 여러 패킷이 올 수도 있음.
-                while (packets * 100 < targetBuff.length) {
-                    idx = packets * 100;
-                    header = Header.bytesToHeader(targetBuff.slice(idx, idx + Protocol.HEADER_SIZE));
-
-                    var bodyBuff = new flatbuffers.ByteBuffer(
-                        new Uint8Array(targetBuff.slice(idx + Protocol.HEADER_SIZE, idx + Protocol.HEADER_SIZE + header.length)));
-
-                    var body = Packet.Body.getRootAsBody(bodyBuff);
-
-                    //idx += header.length;
-                    if (body.cmd() == Packet.Command.PG_START) {
-                        ConsoleLogger.StartMessage('Monitoring Start');
-
-                        // publish monitoring start message
-                        //postMan.publish(new Message(Protocol.CMD_START, body.data()));
-                        postMan.publish(new Message(Protocol.CMD_START, 1));
-                    }
-                    else if (body.cmd() == Packet.Command.PG_END) {
-                        console.log('cmd : pg_end');
-
-                        // publish monitoring end message
-                        //postMan.publish(new Message(Protocol.CMD_END, body.data()));
-                        postMan.publish(new Message(Protocol.CMD_END, 1));
-
-                        // end logic
-                        ConsoleLogger.SimpleMessage('packets : ' + count);
-                        ConsoleLogger.EndMessage('Monitoring End');
-
-                        monitor.clear();
-
-                        startTime = 0;
-                        count = 0;
-                        endTime = 0;
-                    }
-                    else if (body.cmd() == Packet.Command.PG_DUMMY) {
-                        // PG_DUMMY
-                        console.log('dummy packet : ' + count);
-                        count++;
-                        monitor.getPacket();
-                    }
-                    packets++;
-                }// end loop
-            }
-            catch (err) {
-                console.error(err);
-            }
-        });
-    });
-
-    server.listen(10444, () => {
-        console.log('listen . . .');
-    });
-};
-
-function testListen() {
-
-    Buffer.poolSize = 100 * 2000;
-
-    server = net.createServer((socket) => {
-
-        tmpBuff = Buffer.alloc(0);
-
-        socket.on('error', (err) => {
-            ConsoleLogger.SimpleMessage(err);
-        });
-
-        socket.on('close', () => {
-            ConsoleLogger.SimpleMessage('data event counts : ' + dataCount);
-        });
-
-        socket.on('data', (data) => {
-
-            postMan.publish('adf');
-
-        });
-    });
-
-    server.listen(10444, () => {
-        postMan.init();
-        console.log('listen . . .');
-    });
-};
-
-tmpBuff = Buffer.alloc(0);
+function gracefulShutdown() {
+    if (client != null) {
+        client == null;
+        ConsoleLogger.SimpleMessage('graceful shutdown');
+        client.destroy();   
+        monitor.clear();
+    }
+}
 
 function udpListen() {
 
@@ -344,9 +214,7 @@ function udpListen() {
 
                     monitor.clear();
 
-                    startTime = 0;
                     count = 0;
-                    endTime = 0;
                 }
                 else if (body.cmd() == Packet.Command.PG_DUMMY) {
                     // PG_DUMMY
@@ -369,14 +237,6 @@ function udpListen() {
     udpServer.bind(10433);
 }
 
-function initialize() {
-    
-    connect();
-    //listen();
-    //udpListen();
-    //starter = setInterval(connect, 1000*1);
-}
-
-module.exports.start = start;
 module.exports.connect = connect;
-module.exports.listen = testListen;
+//module.exports.listen = testListen;
+module.exports.close = gracefulShutdown;

@@ -20,7 +20,7 @@ function Monitor() {
 
         this.performanceHolder = new Map();
 
-        this.setStartTime(process.hrtime());
+        //this.setStartTime(process.hrtime());
 
         console.log('[TCP] monitor 셋팅 완료');
         //console.log('============================================');
@@ -32,16 +32,18 @@ function Monitor() {
 
         console.log('[TCP] monitor clear');
     }
-
-    this.setStartTime = function (startTime) {
-        this.startTime = startTime;
-        return true;
+    
+    
+    this.start = ()=> { 
+        this.setTimer();
+    }
+    
+    this.stop = ()=> {
+        this.stopTimer();
     }
 
     this.setTimer = function () {
-        
         console.log('[TCP] start timer');
-
         this.timer = setInterval(this.calculateIndicator.bind(this), 1000); // 1초마다 수행
     }
 
@@ -68,21 +70,6 @@ function Monitor() {
 
         this.packets = 0;
         this.duration++;
-    }
-
-    // from ~ to 의 data를 반환한다.
-    // deprecated.
-    this.getPerformData = function (from, to) {
-
-        var result = [];
-
-        for (var idx = from; idx < to; idx++) {
-            result.push({
-                'duration': idx,
-                'packets': this.performanceHolder.get(idx)
-            });
-        }
-        return result;
     }
 }
 

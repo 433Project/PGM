@@ -1,5 +1,6 @@
 ﻿var DataHolder = require('../util/DataHolder');
 var FileLogger = require('../util/FileLogger');
+var ConsoleLogger = require('../util/ConsoleLogger');
 
 // 테스트 1개에 대한 Prototype
 function Test() {
@@ -8,6 +9,7 @@ function Test() {
     this.arrivedCount;
 
     this.startTime;
+    this.currentSeconds;
     this.endTime;
 
     this.dataHolder; 
@@ -15,13 +17,14 @@ function Test() {
     this.logPath;
     this.fileName;
 
-    this.state;
+    this.state;// test state
 
     this.init = () => {
         this.count = 0;
         this.arrivedCount = 0;
         this.startTime = null;
         this.endTime = null;
+        this.currentSeconds = 0;
 
         this.dataHolder = DataHolder;
         this.logPath = '';
@@ -37,11 +40,14 @@ function Test() {
         this.count = count;
         // log용 파일 생성
         FileLogger.createFile();
+
+        ConsoleLogger.SimpleMessage('test start');
     }
 
     this.addData = (data) => {
         this.dataHolder.addData(data);
         FileLogger.writeLog(data);
+        this.currentSeconds++;
     }
 
     // 모니터링 종료
@@ -50,6 +56,8 @@ function Test() {
         // 종료 시간 설정
         this.endTime = new Date();
         FileLogger.close();
+
+        ConsoleLogger.SimpleMessage('test end');
     }
 
     this.getLogPath = function () {

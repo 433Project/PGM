@@ -1,6 +1,4 @@
 ﻿
-
-
 function ConsoleLogger() {
     
     this.StartMessage = (msg) => {

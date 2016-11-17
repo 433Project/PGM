@@ -1,10 +1,10 @@
 ﻿var fs = require('fs');
 var path = require('path');
-
+var logger = require('winston');
 
 function FileLogger() {
 
-    this.filePrefix = 'test';
+    this.filePrefix = 'test_';
     this.enconding = 'utf8';
     this.extension = '.txt';
     this.fileName='';
@@ -14,13 +14,13 @@ function FileLogger() {
 
     // create file 
     this.createFile = function () {
-        //this.fileName = path.join(__dirname, );
-        console.log('log 파일 경로 : ' + this.fileName);
-        this.fileName = './logs/' + this.filePrefix + this.formatDate(new Date() + this.extension);
+ 
+        this.fileName = './logs/' + this.filePrefix + this.formatDate(new Date()) + this.extension;
+        //logger.info('log file 생성 : ' + this.fileName);
 
         fs.open(this.fileName, 'w', (err, fd) => {
             if (err) {
-                console.error(err);
+                logger.error(err);
                 return false;
             }
                 
@@ -35,7 +35,6 @@ function FileLogger() {
 
         if (this.fd != 0) {
             // file opend.
-
             fs.write(this.fd, this.format(msg), this.encoding, function (err) {
                 if (err) {
                     console.error(err);
@@ -52,6 +51,7 @@ function FileLogger() {
     this.close = () => {
         fs.close(this.fd, () => {
             //console.log('close log file');
+            
         });
     };
 
@@ -76,11 +76,11 @@ function FileLogger() {
             month = '' + (d.getMonth() + 1),
             day = '' + d.getDate(),
             year = d.getFullYear();
-
+        
         if (month.length < 2) month = '0' + month;
         if (day.length < 2) day = '0' + day;
 
-        return [year, month, day].join('-');
+        return [year, month, day].join('-') + '_' + [d.getHours(), d.getMinutes(), d.getSeconds()].join('-');
     };
 }
 

@@ -30,8 +30,8 @@ PostMan.prototype.init = function () {
     });// end amqp
 };// end method
 
-PostMan.prototype.publish = (packet) => {
-    console.log('[TCP][PUB] send message : ' + msg);
+PostMan.prototype.publish = (msg) => {
+    console.log('[TCP][PUB] ' + msg.cmd);
 
     PostMan.prototype.channel.sendToQueue(PostMan.prototype.queueName, new Buffer(JSON.stringify(msg), this.encoding));
 };

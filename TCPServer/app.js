@@ -1,22 +1,40 @@
-﻿var monitoringServer = require('./src/main/MonitoringServer.js');
+﻿// set staging level
+var env = process.argv[3];
+if (env == 'dev') {
+    console.log('set env');
+    process.env.stage = 'dev';
+}
+else if (env == 'live') {
+    process.env.stage = 'live';
+}
+//--- node module
 
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
-
-// var process = require('process');
 var type = process.argv[2];
-var isClustered = process.argv[3];
+
+var monitoringServer = require('./src/main/MonitoringServer.js');
+
+var logger = require('./src/main/util/Logger').logger;
+
+//var isClustered = process.argv[3];
 
 var maxCluster = numCPUs;
 
 // run server as client - connect
-if (type == 'c') {
+if (type == 'client') {
     monitoringServer.connect();
 }
 else {
     // run server as server - listen
     monitoringServer.listen();
 }
+
+process.on('SIGINT', () => {
+    console.log('get ctrl+c');
+    //monitoringServer.close();
+    process.exit();
+});
 
 
 /*
@@ -53,5 +71,4 @@ else {
         monitoringServer.start();
     }
 }
-
 */

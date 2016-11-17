@@ -14,11 +14,11 @@
     "reload-server": "pm2 reload tcpserver",
     "logs": "pm2 logs tcpserver",
 
-    "start-client-multi-instance": "node app.js c 3",
-    "start-client-one-instance": "node app.js c 1",
-    "start-server-one-instance": "node app.js s"
+    "start-client-dev": "node app.js client dev",
+    "start-client-live": "node app.js client live"
   },
   "dependencies": {
-    "mime": "^1.3.4"
+    "mime": "^1.3.4",
+    "winston": "^2.3.0"
   }
 }

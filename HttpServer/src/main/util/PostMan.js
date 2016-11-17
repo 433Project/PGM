@@ -9,7 +9,6 @@ var Test = require('../types/Test');
 const ConsoleLogger = require('./ConsoleLogger');
 var clientHolder = require('./ClientHolder');
 
-
 // rabbitmq receiver
 function PostMan() {};
 
@@ -38,25 +37,48 @@ PostMan.prototype.subscribe = function (callback) {
     PostMan.prototype.channel.consume(PostMan.prototype.queueName, (msg) => {
 
         var message = JSON.parse(msg.content);
+        console.log(message);
 
-        var message = new Message();
-        if (message.cmd = Protocol.CMD_START) {
+        if (message.cmd == Protocol.CMD_START) {
             // start test
+            ConsoleLogger.SimpleMessage('[SUB] CMD_START');
             Test.startTest();
         }
         else if (message.cmd == Protocol.CMD_END) {
             // dummy packet
+            ConsoleLogger.SimpleMessage('[SUB] CMD_END');
             Test.endTest();
-            clientHolder.emit('msg', { 'cmd': Protocol.CMD_END, 'data': 0 });
+
+            if (clientHolder.client != null)
+                clientHolder.client.emit('msg', { 'cmd': Protocol.CMD_END, 'data': 0 });
         }
         else if (message.cmd == Protocol.CMD_DATA) {
             // handle data(pps)
-            Test.addData(message.data);
+            Test.addData(message.data); // 계산된 pps를 저장한다.
+
+            var from;
+            var to;
+            Test.dataHolder.getData(from, to);
+
+            from = Test.currentSeconds - 10;
+
+            if (Test.currentSeconds < 10) {
+                from = 0;
+            }
+
+            to = Test.currentSeconds;
+
+            var result = Test.dataHolder.getData(from,to);
+
+            // send pps to client
+            var pps = { 'cmd': Protocol.CMD_DATA, 'data': result};
+
+            if (clientHolder.client != null)
+                clientHolder.client.emit('msg', pps);
         }
         else {
             // not defined packet
             // error
-            
         }
     }, { noAck: true }); // end subscribe
 }

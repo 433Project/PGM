@@ -40,6 +40,7 @@
     <Compile Include="src\main\util\FileLogger.js" />
     <Compile Include="src\main\util\PostMan.js" />
     <Compile Include="src\main\WebServer.js" />
+    <Content Include="index-backup.html" />
     <Content Include="index.html" />
     <Content Include="package.json" />
     <Content Include="README.md" />
@@ -64,6 +65,7 @@
     <Folder Include="typings\globals\express\" />
     <Folder Include="typings\globals\node\" />
     <Folder Include="typings\globals\socket.io\" />
+    <Folder Include="typings\globals\winston\" />
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +75,7 @@
     <TypeScriptCompile Include="typings\globals\express\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\socket.io\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\winston\index.d.ts" />
     <TypeScriptCompile Include="typings\index.d.ts" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->

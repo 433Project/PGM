@@ -1,10 +1,8 @@
 ﻿{
-  "monitoring": {
-    "port": "12345"
+  "connection": {
+    "ip": "10.100.10.6",
+    "port": "11433"
   },
-  "web": {
-    "ip": "10.100.10.9",
-    "port": "12346"
-  }
+  "max_packet_size": 100
 
 }
