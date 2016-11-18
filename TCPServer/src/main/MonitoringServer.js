@@ -20,14 +20,11 @@ var configuration = require('./util/Configuration.js');
 var monitor = require('./util/Monitor.js');
 const postMan = require('./util/PostMan.js');
 const logger = require('./util/Logger').logger;
-//---------- Common Util
-var ConsoleLogger = require('./util/ConsoleLogger');
+
 
 //--------------------- local variable
 var isStart = false;
 var count = 0;
-
-
 var rioSize = configuration.connection.max_packet_size;
 
 var tmpBuff;
@@ -39,8 +36,7 @@ var client = null;
 function connect() {
 
     client = net.createConnection(configuration.connection.port, configuration.connection.ip, () => {
-        //ConsoleLogger.SimpleMessage('connect!');
-        logger.LOG('connect TO cs');
+        logger.LOG('connect to cs');
         tmpBuff = Buffer.alloc(0);
     });
 
@@ -55,8 +51,6 @@ function connect() {
 
             // 아직 rio 1packet이 도착하지 않은 경우, 보존시킨다.
             if (targetBuff.length < rioSize) {
-                console.log('targetbuff length : ' + targetBuff.length);
-
                 tmpBuff = Buffer.alloc(data.length);
                 data.copy(tmpBuff, 0, 0, data.length);
                 return;
@@ -92,28 +86,24 @@ function connect() {
                     postMan.publish(new Message(Protocol.CMD_START, 1));
                 }
                 else if (body.cmd() == Packet.COMMAND.PG_END) {
-                    console.log('cmd : pg_end');
+                    logger.LOG('cmd:pg_end');
 
                     // publish monitoring end message
-                    //postMan.publish(new Message(Protocol.CMD_END, body.data()));
                     postMan.publish(new Message(Protocol.CMD_END, 1));
 
                     // end logic
-                    ConsoleLogger.SimpleMessage('packets : ' + count);
-                    ConsoleLogger.EndMessage('Monitoring End');
+                    logger.LOG('total packets : ' + count);
+                    logger.LOG('Monitoring END');
 
                     monitor.stop();
                     monitor.clear();
-
                     count = 0;
                 }
                 else if (body.cmd() == Packet.COMMAND.PG_DUMMY) {
-                    // PG_DUMMY
-                    count++;
-                    // inc count 
+                    count++; 
                     monitor.getPacket();
                 }
-                packets++;//?
+                packets++;
             }// end loop
         }
         catch (err) {
@@ -122,18 +112,14 @@ function connect() {
     });// end data 
 
     client.on('error', (err) => {
-        ConsoleLogger.SimpleMessage(err);
+        logger.LOG(err);
     });
     
     client.on('close', () => {
-        console.log('packets : ' + count);
+        logger.LOG('Socket Closed');
 
-        ConsoleLogger.SimpleMessage('Socket Closed');
-        
         monitor.clear();
-
         count = 0;
-        //connect();
     });    
 }
 
@@ -239,4 +225,4 @@ function udpListen() {
 
 module.exports.connect = connect;
 //module.exports.listen = testListen;
-module.exports.close = gracefulShutdown;
+//module.exports.close = gracefulShutdown;

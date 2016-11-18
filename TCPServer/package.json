@@ -15,7 +15,9 @@
     "logs": "pm2 logs tcpserver",
 
     "start-client-dev": "node app.js client dev",
-    "start-client-live": "node app.js client live"
+    "start-client-live": "node app.js client live",
+    "start-client-dev-prof": "node app.js client dev --prof",
+    "start-client-live-prof": "node app.js client live --prof"
   },
   "dependencies": {
     "mime": "^1.3.4",

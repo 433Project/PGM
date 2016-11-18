@@ -6,25 +6,27 @@ const dataHolder = require('./DataHolder.js');
 
 const Protocol = require('../types/Protocol').Protocol;
 var Test = require('../types/Test');
-const ConsoleLogger = require('./ConsoleLogger');
+
+const logger = require('./Logger').logger;
+
 var clientHolder = require('./ClientHolder');
 
 // rabbitmq receiver
 function PostMan() {};
 
-PostMan.prototype.queueName = 'asdf';
+PostMan.prototype.queueName = 'pgmq';
 PostMan.prototype.channel = null;
 PostMan.prototype.init = function (callback) {
     amqp.connect('amqp://localhost', function (err, conn) {
         conn.createChannel(function (err, ch) {
             
             if (err) {
-                ConsoleLogger.SimpleMessage('[HTTP] 초기화 에러.' + err);
+                logger.LOG('[HTTP] 초기화 에러.' + err);
             }
             else {
                 ch.assertQueue(PostMan.prototype.queueName, { durable: false });                
                 
-                ConsoleLogger.SimpleMessage('message queue 초기화 완료');
+                logger.LOG('message queue 초기화 완료');
                 PostMan.prototype.channel = ch;
             }
             callback(null);
@@ -37,16 +39,17 @@ PostMan.prototype.subscribe = function (callback) {
     PostMan.prototype.channel.consume(PostMan.prototype.queueName, (msg) => {
 
         var message = JSON.parse(msg.content);
-        console.log(message);
+        logger.LOG(message);
 
         if (message.cmd == Protocol.CMD_START) {
             // start test
-            ConsoleLogger.SimpleMessage('[SUB] CMD_START');
+            logger.LOG('[SUB] start monitoring');
             Test.startTest();
         }
         else if (message.cmd == Protocol.CMD_END) {
             // dummy packet
-            ConsoleLogger.SimpleMessage('[SUB] CMD_END');
+            logger.LOG('[SUB] end monitoring');
+
             Test.endTest();
 
             if (clientHolder.client != null)

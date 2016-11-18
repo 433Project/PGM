@@ -11,7 +11,8 @@ var config = require('./util/Configuration.js').web;
 var postMan = require('./util/PostMan.js');
 var dataHolder = require('./util/DataHolder.js');
 var test = require('./types/Test');
-var ConsoleLogger = require('./util/ConsoleLogger');
+
+const logger = require('./util/Logger').logger;
 var clientHolder = require('./util/ClientHolder');
 
 //----- app variable
@@ -28,7 +29,7 @@ function start() {
 
 // middleware
 var reqLogger = function findIP(req, res, next) {
-    console.log('[HTTP][' + req.originalUrl + '] IP : ' + req.ip);
+    logger.LOG('[HTTP][' + req.originalUrl + '] IP : ' + req.ip);
     next();
 }
 
@@ -38,7 +39,6 @@ var httpInit = () => {
 
     // index
     app.get('/', function (req, res) {
-        //postMan.subscribe();
         res.sendFile(path.join(__dirname, '..', '..', 'index.html'));
     });
 
@@ -58,19 +58,17 @@ var httpInit = () => {
     });
 
     server.listen(config.port, config.ip, () => {
-        ConsoleLogger.SimpleMessage('listen');
+        logger.LOG('listening . . .');
     });
 }
 
 var ioInit = () => {
     io.on('connection', function (socket) {
-
-        ConsoleLogger.SimpleMessage('client connect');
+        logger.LOG('web client connect');
 
         socket.on('disconnect', () => {
-            ConsoleLogger.SimpleMessage('client disconnect');
+            logger.LOG('client disconnect');
             clientHolder.client = null;
-                
         });
         clientHolder.client = socket;
     });

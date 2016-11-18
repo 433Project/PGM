@@ -9,7 +9,14 @@
     "kill-server": "pm2 delete httpserver",
     "monitor-server": "pm2 monit",
     "reload-server": "pm2 reload httpserver",
-    "logs": "pm2 logs httpserver"
+    "logs": "pm2 logs httpserver",
+
+    "start-dev": "node app.js dev",
+    "start-live": "node app.js live",
+
+    "start-dev-prof": "node app.js dev --prof",
+    "start-live-prof": "node app.js live --prof"
+
   },
   "author": {
     "name": "dongqlee"

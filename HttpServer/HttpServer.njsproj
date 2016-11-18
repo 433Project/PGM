@@ -32,12 +32,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="config\GlobalConfig.js" />
     <Compile Include="middlewares\ReqLogger.js" />
-    <Compile Include="src\main\util\AppLogger.js" />
     <Compile Include="src\main\util\ClientHolder.js" />
-    <Compile Include="src\main\util\ConsoleLogger.js" />
     <Compile Include="src\main\util\DataHolder.js" />
     <Compile Include="src\main\util\FileLogger.js" />
+    <Compile Include="src\main\util\Logger.js" />
     <Compile Include="src\main\util\PostMan.js" />
     <Compile Include="src\main\WebServer.js" />
     <Content Include="index-backup.html" />

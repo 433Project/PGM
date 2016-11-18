@@ -6,7 +6,7 @@ function PostMan() {
     this.encoding = 'utf8';
 };
 
-PostMan.prototype.queueName = 'asdf';
+PostMan.prototype.queueName = 'pgmq';
 
 PostMan.prototype.channel = null;
 PostMan.prototype.init = function () {

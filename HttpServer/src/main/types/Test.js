@@ -1,6 +1,6 @@
 ﻿var DataHolder = require('../util/DataHolder');
 var FileLogger = require('../util/FileLogger');
-var ConsoleLogger = require('../util/ConsoleLogger');
+const logger = require('../util/Logger').logger;
 
 // 테스트 1개에 대한 Prototype
 function Test() {
@@ -41,7 +41,7 @@ function Test() {
         // log용 파일 생성
         FileLogger.createFile();
 
-        ConsoleLogger.SimpleMessage('test start');
+        logger.LOG('test start');
     }
 
     this.addData = (data) => {
@@ -56,8 +56,7 @@ function Test() {
         // 종료 시간 설정
         this.endTime = new Date();
         FileLogger.close();
-
-        ConsoleLogger.SimpleMessage('test end');
+        logger.LOG('test end');
     }
 
     this.getLogPath = function () {

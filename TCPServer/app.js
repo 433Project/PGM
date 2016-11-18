@@ -32,7 +32,6 @@ else {
 
 process.on('SIGINT', () => {
     console.log('get ctrl+c');
-    //monitoringServer.close();
     process.exit();
 });
 

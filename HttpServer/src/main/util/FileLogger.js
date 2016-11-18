@@ -1,6 +1,6 @@
 ﻿var fs = require('fs');
 var path = require('path');
-var logger = require('winston');
+var logger = require('./Logger').logger;
 
 function FileLogger() {
 
@@ -16,16 +16,16 @@ function FileLogger() {
     this.createFile = function () {
  
         this.fileName = './logs/' + this.filePrefix + this.formatDate(new Date()) + this.extension;
-        //logger.info('log file 생성 : ' + this.fileName);
 
         fs.open(this.fileName, 'w', (err, fd) => {
             if (err) {
-                logger.error(err);
+                logger.LOG(err);
                 return false;
             }
                 
             this.fd = fd;
-            console.log('file open!');
+
+            logger.LOG('file open!');
             return true;
         });
     };
@@ -37,7 +37,7 @@ function FileLogger() {
             // file opend.
             fs.write(this.fd, this.format(msg), this.encoding, function (err) {
                 if (err) {
-                    console.error(err);
+                    logger.LOG(err);
                 }
             });
         }
@@ -50,8 +50,6 @@ function FileLogger() {
 
     this.close = () => {
         fs.close(this.fd, () => {
-            //console.log('close log file');
-            
         });
     };
 
