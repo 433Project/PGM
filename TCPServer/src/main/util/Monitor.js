@@ -7,23 +7,18 @@ const Protocol = require('../types/Protocol');
 function Monitor() {
 
     this.performanceHolder = null;
-    this.startTime = 0;
     this.duration = 0;
     this.packets = 0;
     this.timer = null;
 
     this.init = function () {
-        //console.log('============================================');
         if (this.performanceHolder == null) {
             this.performanceHolder = new Map();
         }
 
         this.performanceHolder = new Map();
 
-        //this.setStartTime(process.hrtime());
-
         console.log('[TCP] monitor 셋팅 완료');
-        //console.log('============================================');
     }
     // clear map.
     this.clear = function () {
@@ -32,7 +27,6 @@ function Monitor() {
 
         console.log('[TCP] monitor clear');
     }
-    
     
     this.start = ()=> { 
         this.setTimer();
@@ -66,7 +60,6 @@ function Monitor() {
 
         // publish
         PostMan.publish(new Message(Protocol.CMD_DATA, { "duration": this.duration, "packets": this.packets }) );
-        //console.log(this.duration + ' ~ ' + (this.duration + 1) + '동안' + this.packets + '개 수신함');
 
         this.packets = 0;
         this.duration++;

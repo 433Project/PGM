@@ -10,7 +10,6 @@ function State() {
     this.STATE_IDEL = 0;
     this.STATE_RUNNNING = 1;
     this.STATE_END = 2;
-
 }
 
 module.exports.Protocol = new Protocol();

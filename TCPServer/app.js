@@ -17,8 +17,6 @@ var monitoringServer = require('./src/main/MonitoringServer.js');
 
 var logger = require('./src/main/util/Logger').logger;
 
-//var isClustered = process.argv[3];
-
 var maxCluster = numCPUs;
 
 // run server as client - connect
@@ -31,10 +29,9 @@ else {
 }
 
 process.on('SIGINT', () => {
-    console.log('get ctrl+c');
-    process.exit();
+    // gracefull shutdown
+    monitoringServer.close();
 });
-
 
 /*
 // one instance

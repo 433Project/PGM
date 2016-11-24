@@ -1,13 +1,4 @@
-﻿
-
-
-function Header() {
-
-    //this.length;
-    //this.srcType;
-    //this.srcCode;
-    //this.dstType;
-    //this.dstCode;
+﻿function Header() {
 
     this.intLength = 4;
 
@@ -23,7 +14,6 @@ function Header() {
         var idx = 0;
 
         if (data.length != 20) {
-            //console.log('deserialization error');
             return null;
         }
         else {
@@ -44,11 +34,9 @@ function Header() {
             idx += this.intLength;       
 
             header = { "length": length, "srcType": srcType, "srcCode": srcCode, "dstType": dstType, "dstCode": dstCode };
-            //console.log(header);
             return header;
         }
     }// end method
-
 }
 
 module.exports = new Header();

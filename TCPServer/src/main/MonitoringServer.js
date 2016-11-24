@@ -21,7 +21,6 @@ var monitor = require('./util/Monitor.js');
 const postMan = require('./util/PostMan.js');
 const logger = require('./util/Logger').logger;
 
-
 //--------------------- local variable
 var isStart = false;
 var count = 0;
@@ -34,6 +33,8 @@ var dataCount = 0;
 var client = null;
 
 function connect() {
+
+    console.log(configuration.connection.ip);
 
     client = net.createConnection(configuration.connection.port, configuration.connection.ip, () => {
         logger.LOG('connect to cs');
@@ -114,21 +115,28 @@ function connect() {
     client.on('error', (err) => {
         logger.LOG(err);
     });
-    
-    client.on('close', () => {
-        logger.LOG('Socket Closed');
 
-        monitor.clear();
-        count = 0;
-    });    
+    client.on('close', HandleClose);
+}
+
+const HandleClose = () => {
+    logger.LOG('Socket Closed');
+    monitor.clear();
+    count = 0;
+    connect();
 }
 
 function gracefulShutdown() {
     if (client != null) {
+
+        client.removeListener('close', HandleClose);
+        client.destroy();
         client == null;
-        ConsoleLogger.SimpleMessage('graceful shutdown');
-        client.destroy();   
+        //ConsoleLogger.SimpleMessage('graceful shutdown');
+        logger.LOG('event detach');
+           
         monitor.clear();
+        process.exit();
     }
 }
 
@@ -224,5 +232,4 @@ function udpListen() {
 }
 
 module.exports.connect = connect;
-//module.exports.listen = testListen;
-//module.exports.close = gracefulShutdown;
+module.exports.close = gracefulShutdown;

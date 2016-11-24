@@ -1,7 +1,7 @@
 ﻿function Message(cmd, data){
+    
     this.cmd = cmd;
     this.data = data;
-
 
     this.getCmd = function(){
         return this.cmd;
