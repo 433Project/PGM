@@ -1,6 +1,12 @@
-Packet Generator Monitoring Server
+# Packet Generator Monitoring Server
+
+Connection Server Performance Monitor
 
 
-# framework : node.js
-# library : RabbitMQ, winston 
+## Dependency
+- node.js
+- express, socket.io, mime, async 
+- RabbitMQ, Winston 
+
+
 
